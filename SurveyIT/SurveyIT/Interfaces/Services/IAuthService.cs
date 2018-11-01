@@ -8,7 +8,7 @@ namespace SurveyIT.Interfaces.Services
     {
         Task<bool> RegisterUser(RegistrationModel userData);
 
-        User Authenticate(LoginModel login);
+        Task<User> Authenticate(LoginModel login);
 
         string Buildtoken(User user);
     }

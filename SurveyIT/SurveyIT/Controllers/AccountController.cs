@@ -40,14 +40,14 @@ namespace SurveyIT.Controllers
 
         [AllowAnonymous]
         [HttpPost("Auth")]
-        public IActionResult Authentication([FromBody] LoginModel login)
+        public async Task<IActionResult> Authentication([FromBody] LoginModel login)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            var user = authService.Authenticate(login);
+            var user = await authService.Authenticate(login);
 
             if (user != null)
             {

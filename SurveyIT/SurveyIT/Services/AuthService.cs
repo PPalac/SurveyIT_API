@@ -39,11 +39,21 @@ namespace SurveyIT.Services
             return true;
         }
 
-        public User Authenticate(LoginModel login)
+        public async Task<User> Authenticate(LoginModel login)
         {
             //throw new Exception("Weź mnie zaimplementuje programisto!");
 
-            return new User { Email = "jakis@tam.email", FirstName = "Józek", LastName = "Kowalski", UserName = "Józuś" };
+            var user = await userManager.FindByNameAsync(login.Username);
+
+            if (user != null)
+            {
+                if (await userManager.CheckPasswordAsync(user, login.Password))
+                {
+                    return user;
+                }
+            }
+
+            return null;
         }
 
         public string Buildtoken(User user)
