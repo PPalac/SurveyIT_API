@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SurveyIT.Interfaces.Services;
 using SurveyIT.Services;
+using SurveyIT.Models.DBModels;
+using Microsoft.AspNetCore.Identity;
 
 namespace SurveyIT
 {
@@ -44,7 +41,25 @@ namespace SurveyIT
                 });
 
             services.AddMvc();
+
             services.AddScoped<IAuthService, AuthService>();
+
+            services.AddDbContext<SurveyIT.DB.MyDbContext>(options =>
+            options.UseSqlServer(Configuration["ConnectionString"],
+            b => b.MigrationsAssembly("SurveyIT")));
+
+            var builder = services.AddIdentityCore<User>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+                options.Password.RequireDigit = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 4;
+            });
+
+            builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), builder.Services);
+            builder.AddEntityFrameworkStores<SurveyIT.DB.MyDbContext>().AddDefaultTokenProviders();
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

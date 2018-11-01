@@ -1,30 +1,52 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using SurveyIT.DB;
 using SurveyIT.Interfaces.Services;
 using SurveyIT.Models;
+using SurveyIT.Models.DBModels;
 
 namespace SurveyIT.Services
 {
     public class AuthService : IAuthService
     {
         private IConfiguration config;
+        private UserManager<User> userManager;
+        private MyDbContext dbContext;
 
-        public AuthService(IConfiguration config)
+        public AuthService(IConfiguration config, UserManager<User> userManager, MyDbContext dbContext)
         {
             this.config = config;
+            this.userManager = userManager;
+            this.dbContext = dbContext;
+        }
+        public async Task<bool> RegisterUser(RegistrationModel userData)
+        {
+            var user = new User { FirstName = userData.FirstName, LastName = userData.LastName, Email = userData.Email, UserName = userData.Username };
+
+            var result = await userManager.CreateAsync(user, userData.Password);
+
+            if (!result.Succeeded)
+                return false;
+
+            await dbContext.Respondents.AddAsync(new Respondent { IdentityId = user.Id, GroupId = 0 });
+            await dbContext.SaveChangesAsync();
+
+            return true;
         }
 
-        public UserModel Authenticate(LoginModel login)
+        public User Authenticate(LoginModel login)
         {
             //throw new Exception("Weź mnie zaimplementuje programisto!");
 
-            return new UserModel { Email = "jakis@tam.email", FirstName = "Józek", LastName = "Kowalski", Username = "Józuś" };
+            return new User { Email = "jakis@tam.email", FirstName = "Józek", LastName = "Kowalski", UserName = "Józuś" };
         }
 
-        public string Buildtoken(UserModel user)
+        public string Buildtoken(User user)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
             var credentials = new SigningCredentials(
@@ -39,5 +61,6 @@ namespace SurveyIT.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
     }
 }

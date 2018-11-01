@@ -1,11 +1,15 @@
-﻿using SurveyIT.Models;
+﻿using System.Threading.Tasks;
+using SurveyIT.Models;
+using SurveyIT.Models.DBModels;
 
 namespace SurveyIT.Interfaces.Services
 {
     public interface IAuthService
     {
-        UserModel Authenticate(LoginModel login);
+        Task<bool> RegisterUser(RegistrationModel userData);
 
-        string Buildtoken(UserModel user);
+        User Authenticate(LoginModel login);
+
+        string Buildtoken(User user);
     }
 }
