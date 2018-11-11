@@ -14,9 +14,9 @@ namespace SurveyIT.Services
 {
     public class AuthService : IAuthService
     {
-        private IConfiguration config;
-        private UserManager<User> userManager;
-        private MyDbContext dbContext;
+        private readonly IConfiguration config;
+        private readonly UserManager<User> userManager;
+        private readonly MyDbContext dbContext;
 
         public AuthService(IConfiguration config, UserManager<User> userManager, MyDbContext dbContext)
         {
