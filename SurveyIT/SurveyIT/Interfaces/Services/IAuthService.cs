@@ -8,8 +8,8 @@ namespace SurveyIT.Interfaces.Services
     {
         Task<bool> RegisterUser(RegistrationModel userData);
 
-        Task<User> Authenticate(LoginModel login);
+        Task<Users> Authenticate(LoginModel login);
 
-        string Buildtoken(User user);
+        string Buildtoken(Users user);
     }
 }

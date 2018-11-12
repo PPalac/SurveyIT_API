@@ -48,7 +48,7 @@ namespace SurveyIT
             options.UseSqlServer(Configuration["ConnectionString"],
             b => b.MigrationsAssembly("SurveyIT")));
 
-            var builder = services.AddIdentityCore<User>(options =>
+            var builder = services.AddIdentityCore<Users>(options =>
             {
                 options.User.RequireUniqueEmail = true;
                 options.Password.RequireDigit = false;

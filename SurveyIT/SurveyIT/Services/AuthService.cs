@@ -15,10 +15,10 @@ namespace SurveyIT.Services
     public class AuthService : IAuthService
     {
         private readonly IConfiguration config;
-        private readonly UserManager<User> userManager;
+        private readonly UserManager<Users> userManager;
         private readonly MyDbContext dbContext;
 
-        public AuthService(IConfiguration config, UserManager<User> userManager, MyDbContext dbContext)
+        public AuthService(IConfiguration config, UserManager<Users> userManager, MyDbContext dbContext)
         {
             this.config = config;
             this.userManager = userManager;
@@ -26,20 +26,19 @@ namespace SurveyIT.Services
         }
         public async Task<bool> RegisterUser(RegistrationModel userData)
         {
-            var user = new User { FirstName = userData.FirstName, LastName = userData.LastName, Email = userData.Email, UserName = userData.Username };
+            var user = new Users { FirstName = userData.FirstName, LastName = userData.LastName, Email = userData.Email, UserName = userData.Username };
 
             var result = await userManager.CreateAsync(user, userData.Password);
 
             if (!result.Succeeded)
                 return false;
-
-            await dbContext.Respondents.AddAsync(new Respondent { IdentityId = user.Id, GroupId = 0 });
+            await dbContext.Users.AddAsync(new Users { Id = user.Id });
             await dbContext.SaveChangesAsync();
 
             return true;
         }
 
-        public async Task<User> Authenticate(LoginModel login)
+        public async Task<Users> Authenticate(LoginModel login)
         {
             //throw new Exception("Weź mnie zaimplementuje programisto!");
 
@@ -56,7 +55,7 @@ namespace SurveyIT.Services
             return null;
         }
 
-        public string Buildtoken(User user)
+        public string Buildtoken(Users user)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
             var credentials = new SigningCredentials(

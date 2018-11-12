@@ -9,13 +9,21 @@ using SurveyIT.Models.DBModels;
 
 namespace SurveyIT.DB
 {
-    public class MyDbContext : IdentityDbContext<User>
+    public class MyDbContext : IdentityDbContext<Users>
     {
         public MyDbContext(DbContextOptions options) : base(options)
         {
 
         }
 
-        public DbSet<Respondent> Respondents { get; set; }
+        public DbSet<Answers> Answers { get; set; }
+        public DbSet<Answers_List> Answers_List { get; set; }
+        public DbSet<Groups> Groups { get; set; }
+        public DbSet<GroupsLink> GroupsLink { get; set; }
+        public DbSet<Questions> Questions { get; set; }
+        public DbSet<Questions_List> Questions_List { get; set; }
+        public DbSet<Surveys> Surveys { get; set; }
+        public DbSet<Surveys_List> Surveys_List { get; set; }
+        public DbSet<Users> New_Users { get; set; }
     }
 }
