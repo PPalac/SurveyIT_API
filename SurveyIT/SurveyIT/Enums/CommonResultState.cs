@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SurveyIT.Enums
 {
-    public enum EnumStateMessage
+    public enum CommonResultState
     {
         OK,
         Error,

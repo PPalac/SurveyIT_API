@@ -10,13 +10,13 @@ namespace SurveyIT.Interfaces.Services
 {
     public interface IGroupService
     {
-        Task<ResourceMessages> AddGroup(GroupModel group);
+        Task<CommonResult> AddGroup(GroupModel group);
 
-        ResourceMessages ValidationGroup(GroupModel group);
+        CommonResult ValidationGroup(GroupModel group);
 
-        Task<ResourceMessages> DeleteGroup(string groupName);
+        Task<CommonResult> DeleteGroup(string groupName);
 
-        Task<ResourceMessages> EditGroup(GroupModel group, string newGroupName);
+        Task<CommonResult> EditGroup(GroupModel group, string newGroupName);
 
         List<string> GetAllGroups();
     }

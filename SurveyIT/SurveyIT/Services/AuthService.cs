@@ -24,6 +24,7 @@ namespace SurveyIT.Services
             this.userManager = userManager;
             this.dbContext = dbContext;
         }
+
         public async Task<bool> RegisterUser(RegistrationModel userData)
         {
             var user = new Users { FirstName = userData.FirstName, LastName = userData.LastName, Email = userData.Email, UserName = userData.Username };

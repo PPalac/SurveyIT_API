@@ -22,7 +22,7 @@ namespace SurveyIT.Services
             this.dbContext = dbContext;
         }
 
-        public ResourceMessages ValidationGroup(GroupModel group)
+        public CommonResult ValidationGroup(GroupModel group)
         {
             if (group != null && !string.IsNullOrEmpty(group.Name))
             {
@@ -32,31 +32,33 @@ namespace SurveyIT.Services
                     {
                         if (!dbContext.Groups.Any(g => g.Name == group.Name))
                         {
-                            return new ResourceMessages(EnumStateMessage.OK, "Walidacja poprawna");
+                            return new CommonResult(CommonResultState.OK, "Walidacja poprawna");
                         }
 
-                        return new ResourceMessages(EnumStateMessage.Warning, "Grupa o takiej nazwie istnieje");
+                        return new CommonResult(CommonResultState.Warning, "Grupa o takiej nazwie istnieje");
                     }
 
-                    return new ResourceMessages(EnumStateMessage.Warning, "Za krótka nazwa");
+                    return new CommonResult(CommonResultState.Warning, "Za krótka nazwa");
                 }
 
-                return new ResourceMessages(EnumStateMessage.Warning, "Nazwa powinna zaczynać się od wielkiej litery");
+                return new CommonResult(CommonResultState.Warning, "Nazwa powinna zaczynać się od wielkiej litery");
             }
 
-            return new ResourceMessages(EnumStateMessage.Error, "Błąd walidacji");
+            return new CommonResult(CommonResultState.Error, "Błąd walidacji");
         }
 
-        public async Task<ResourceMessages> AddGroup(GroupModel group)
+        public async Task<CommonResult> AddGroup(GroupModel group)
         {
             try
             {
-                ResourceMessages validationResult = ValidationGroup(group);
-                if (validationResult.StateMessage == EnumStateMessage.OK)
+                CommonResult validationResult = ValidationGroup(group);
+
+                if (validationResult.StateMessage == CommonResultState.OK)
                 {
                     var newGroup = new Groups();
                     newGroup.Name = group.Name;
                     newGroup.GroupsLink = new List<GroupsLink>();
+
                     var users = group.UserId;
 
                     if (users != null)
@@ -66,71 +68,82 @@ namespace SurveyIT.Services
                             newGroup.GroupsLink.Add(new GroupsLink { UserId = user });
                         }
                     }
+
                     dbContext.Groups.Add(newGroup);
+
                     await dbContext.SaveChangesAsync();
-                    return validationResult;
+
+                    return validationResult; //todo: zwracanie nowego resultu z wiadomoscia ze grupa dodana
                 }
 
                 return validationResult;
             }
             catch (Exception ex)
             {
-                return new ResourceMessages(EnumStateMessage.Error, "Błąd");
+                return new CommonResult(CommonResultState.Error, "Błąd");
             }
 
         }
 
-        public async Task<ResourceMessages> DeleteGroup(string groupName)
+        public async Task<CommonResult> DeleteGroup(string groupName)
         {
             try
             {
-                if (groupName != null)
+                if (groupName != null) //todo: isnullorempty
                 {
                     var deleteGroup = dbContext.Groups.FirstOrDefault(g => g.Name == groupName);
                     var deleteGroupsLink = dbContext.GroupsLink.Where(gl => gl.Group.Id == deleteGroup.Id);
+
                     foreach (var group in deleteGroupsLink)
                     {
                         dbContext.GroupsLink.Remove(group);
                     }
+
                     dbContext.Groups.Remove(deleteGroup);
+
                     await dbContext.SaveChangesAsync();
-                    return new ResourceMessages(EnumStateMessage.OK, "Usunieto grupe");
+
+                    return new CommonResult(CommonResultState.OK, "Usunieto grupe");
                 }
 
-                return new ResourceMessages(EnumStateMessage.Error, "Grupa nie istnieje");
+                return new CommonResult(CommonResultState.Error, "Grupa nie istnieje");
             }
             catch (Exception)
             {
-                return new ResourceMessages(EnumStateMessage.Error, "Błąd podczas usuwania grupy");
+                return new CommonResult(CommonResultState.Error, "Błąd podczas usuwania grupy");
             }
 
         }
 
-        public async Task<ResourceMessages> EditGroup(GroupModel group, string newGroupName)
+        public async Task<CommonResult> EditGroup(GroupModel group, string newGroupName)
         {
             try
             {
-                GroupModel groupModel = new GroupModel();
+                GroupModel groupModel = new GroupModel
+                {
+                    Name = newGroupName
+                };
 
-                groupModel.Name = newGroupName;
                 var result = ValidationGroup(groupModel);
 
-                if (result.StateMessage == EnumStateMessage.OK)
+                if (result.StateMessage == CommonResultState.OK)
                 {
                     dbContext.Groups.FirstOrDefault(g => g.Name == group.Name).Name = newGroupName;
+
                     await dbContext.SaveChangesAsync();
-                    return new ResourceMessages(EnumStateMessage.OK, "Zmiana nazwy powiodła sie");
+
+                    return new CommonResult(CommonResultState.OK, "Zmiana nazwy powiodła sie");
                 }
 
                 return result;
             }
             catch (Exception)
             {
-                return new ResourceMessages(EnumStateMessage.Error, "Błąd podczas zmiany nazwy grupy");
+                return new CommonResult(CommonResultState.Error, "Błąd podczas zmiany nazwy grupy");
             }
         }
 
-        public List<string> GetAllGroups()
+        public List<string> GetAllGroups() //todo: zwrocic groupmodel z uzytkownikami
         {
             try
             {
@@ -143,6 +156,7 @@ namespace SurveyIT.Services
                     {
                         groupList.Add(group.Name);
                     }
+
                     return groupList;
                 }
 
@@ -150,7 +164,7 @@ namespace SurveyIT.Services
             }
             catch (Exception)
             {
-                return null;
+                throw new Exception("")
             }
         }
     }

@@ -30,7 +30,7 @@ namespace SurveyIT.Controllers
 
             var result = await groupService.AddGroup(group);
 
-            if (result.StateMessage == EnumStateMessage.OK)
+            if (result.StateMessage == CommonResultState.OK)
                 return Ok("Grupa dodana");
 
             return BadRequest("Błąd");
@@ -45,7 +45,7 @@ namespace SurveyIT.Controllers
 
             var result = await groupService.DeleteGroup(group.Name);
 
-            if (result.StateMessage == EnumStateMessage.OK)
+            if (result.StateMessage == CommonResultState.OK)
                 return Ok("Grupa usunieta");
 
             return BadRequest("Błąd");
@@ -53,14 +53,14 @@ namespace SurveyIT.Controllers
 
         //[Auth(Role.Admin)]
         [HttpPost("Edit")]
-        public async Task<IActionResult> EditGRoup([FromBody]GroupModel group, string newGroupName)
+        public async Task<IActionResult> EditGRoup([FromBody]GroupModel group, string newGroupName) //todo: dodac id do groupmodel
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
             var result = await groupService.EditGroup(group, newGroupName);
 
-            if (result.StateMessage == EnumStateMessage.OK)
+            if (result.StateMessage == CommonResultState.OK)
                 return Ok("Nazwa została zmieniona");
 
             return BadRequest("Błąd");
@@ -68,14 +68,14 @@ namespace SurveyIT.Controllers
 
         //[Auth(Role.Admin)]
         [HttpGet("Display")]
-        public List<string> DisplayAll()
+        public JsonResult DisplayAll() //todo: return lista groupmodel
         {
             var result = groupService.GetAllGroups();
-
+            
             if (result != null)
-                return result;
+                return Json(result);
 
-            return new List<string>();
+            return Json("");
 
         }
     }
