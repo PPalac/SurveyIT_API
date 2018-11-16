@@ -43,6 +43,7 @@ namespace SurveyIT
             services.AddMvc();
 
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IGroupService, GroupService>();
 
             services.AddDbContext<SurveyIT.DB.MyDbContext>(options =>
             options.UseSqlServer(Configuration["ConnectionString"],

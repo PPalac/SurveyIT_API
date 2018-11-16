@@ -18,8 +18,8 @@ namespace SurveyIT.Models.DBModels
         [Required]
         public DateTime End_Date { get; set; }
 
-        public List<Surveys_List> SurveysList_Id { get; set; }
+        public List<Surveys_List> SurveysList { get; set; }
 
-        public List<Questions_List> QuestionsList_Id { get; set; }
+        public List<Questions_List> QuestionsList { get; set; }
     }
 }

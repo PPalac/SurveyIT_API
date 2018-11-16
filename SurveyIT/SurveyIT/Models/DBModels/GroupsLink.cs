@@ -12,8 +12,11 @@ namespace SurveyIT.Models.DBModels
         [Key]
         public int Id { get; set; }
 
-        public Users User_ { get; set; }
+        [ForeignKey("User")]
+        public string UserId { get; set; }
 
-        public Groups Group_ { get; set; }
+        public Users User { get; set; }
+
+        public Groups Group { get; set; }
     }
 }

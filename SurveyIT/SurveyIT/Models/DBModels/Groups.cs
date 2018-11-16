@@ -15,8 +15,8 @@ namespace SurveyIT.Models.DBModels
         [Required]
         public string Name { get; set; }
 
-        public List<GroupsLink> GroupsLink_Id { get; set; }
+        public List<GroupsLink> GroupsLink { get; set; }
 
-        public List<Surveys_List> SurveysList_Id { get; set; }
+        public List<Surveys_List> SurveysList { get; set; }
     }
 }

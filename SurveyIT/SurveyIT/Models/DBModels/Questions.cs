@@ -15,8 +15,8 @@ namespace SurveyIT.Models.DBModels
         [Required]
         public string Content { get; set; }
 
-        public List<Questions_List> QuestionsList_Id { get; set; }
+        public List<Questions_List> QuestionsList { get; set; }
 
-        public List<Answers_List> AnswerList_Id { get; set; }
+        public List<Answers_List> AnswerList { get; set; }
     }
 }

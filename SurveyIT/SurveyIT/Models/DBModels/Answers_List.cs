@@ -12,8 +12,8 @@ namespace SurveyIT.Models.DBModels
         [Key]
         public int Id { get; set; }
 
-        public Questions Question_ { get; set; }
+        public Questions Question { get; set; }
 
-        public Answers Answer_ { get; set; }
+        public Answers Answer { get; set; }
     }
 }

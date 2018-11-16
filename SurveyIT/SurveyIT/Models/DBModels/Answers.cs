@@ -18,6 +18,6 @@ namespace SurveyIT.Models.DBModels
         [Required]
         public TypeAnswers Type { get; set; }
 
-        public List<Answers_List> AnswerList_Id { get; set; }
+        public List<Answers_List> AnswerList { get; set; }
     }
 }
