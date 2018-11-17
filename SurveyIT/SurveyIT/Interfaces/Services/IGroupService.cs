@@ -18,6 +18,6 @@ namespace SurveyIT.Interfaces.Services
 
         Task<CommonResult> EditGroup(GroupModel group, string newGroupName);
 
-        List<string> GetAllGroups();
+        List<GroupModel> GetAllGroups();
     }
 }

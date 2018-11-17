@@ -72,8 +72,8 @@ namespace SurveyIT.Services
                     dbContext.Groups.Add(newGroup);
 
                     await dbContext.SaveChangesAsync();
-
-                    return validationResult; //todo: zwracanie nowego resultu z wiadomoscia ze grupa dodana
+                    validationResult.Message = "Pomyslnie dodano grupe";
+                    return validationResult;
                 }
 
                 return validationResult;
@@ -89,14 +89,17 @@ namespace SurveyIT.Services
         {
             try
             {
-                if (groupName != null) //todo: isnullorempty
+                if (!string.IsNullOrEmpty(groupName)) 
                 {
                     var deleteGroup = dbContext.Groups.FirstOrDefault(g => g.Name == groupName);
                     var deleteGroupsLink = dbContext.GroupsLink.Where(gl => gl.Group.Id == deleteGroup.Id);
 
-                    foreach (var group in deleteGroupsLink)
+                    if (deleteGroupsLink != null)
                     {
-                        dbContext.GroupsLink.Remove(group);
+                        foreach (var group in deleteGroupsLink)
+                        {
+                            dbContext.GroupsLink.Remove(group);
+                        }
                     }
 
                     dbContext.Groups.Remove(deleteGroup);
@@ -143,18 +146,27 @@ namespace SurveyIT.Services
             }
         }
 
-        public List<string> GetAllGroups() //todo: zwrocic groupmodel z uzytkownikami
+        public List<GroupModel> GetAllGroups()
         {
             try
             {
-                List<string> groupList = new List<string>();
+                List<GroupModel> groupList = new List<GroupModel>();
                 var groups = dbContext.Groups.ToList();
 
                 if(groups!=null)
                 {
                     foreach (var group in groups)
                     {
-                        groupList.Add(group.Name);
+                        GroupModel newGroupModel = new GroupModel();
+                        newGroupModel.Name = group.Name;
+                        newGroupModel.Id = group.Id;
+                        var newGroupLink = dbContext.GroupsLink.Where(x => x.Group.Id == newGroupModel.Id);
+
+                        foreach (var groupLink in newGroupLink)
+                        {
+                            newGroupModel.UserId.Add(groupLink.UserId);
+                        }
+                        groupList.Add(newGroupModel);
                     }
 
                     return groupList;
@@ -164,7 +176,7 @@ namespace SurveyIT.Services
             }
             catch (Exception)
             {
-                throw new Exception("")
+                throw new Exception("Błąd wyswietlania");
             }
         }
     }

@@ -31,9 +31,9 @@ namespace SurveyIT.Controllers
             var result = await groupService.AddGroup(group);
 
             if (result.StateMessage == CommonResultState.OK)
-                return Ok("Grupa dodana");
+                return Ok(result.Message);
 
-            return BadRequest("Błąd");
+            return BadRequest(result.Message);
         }
 
         //[Auth(Role.Admin)]
@@ -46,9 +46,9 @@ namespace SurveyIT.Controllers
             var result = await groupService.DeleteGroup(group.Name);
 
             if (result.StateMessage == CommonResultState.OK)
-                return Ok("Grupa usunieta");
+                return Ok(result.Message);
 
-            return BadRequest("Błąd");
+            return BadRequest(result.Message);
         }
 
         //[Auth(Role.Admin)]
@@ -61,21 +61,21 @@ namespace SurveyIT.Controllers
             var result = await groupService.EditGroup(group, newGroupName);
 
             if (result.StateMessage == CommonResultState.OK)
-                return Ok("Nazwa została zmieniona");
+                return Ok(result.Message);
 
-            return BadRequest("Błąd");
+            return BadRequest(result.Message);
         }
 
         //[Auth(Role.Admin)]
         [HttpGet("Display")]
-        public JsonResult DisplayAll() //todo: return lista groupmodel
+        public JsonResult DisplayAll()
         {
             var result = groupService.GetAllGroups();
             
             if (result != null)
                 return Json(result);
 
-            return Json("");
+            return Json("Błąd wyświetlania");
 
         }
     }
