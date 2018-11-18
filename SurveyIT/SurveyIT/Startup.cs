@@ -10,6 +10,8 @@ using SurveyIT.Interfaces.Services;
 using SurveyIT.Services;
 using SurveyIT.Models.DBModels;
 using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
+using SurveyIT.Enums;
 
 namespace SurveyIT
 {
@@ -25,20 +27,48 @@ namespace SurveyIT
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+            services.AddAuthentication("FiverSecurityScheme")
+                .AddCookie("FiverSecurityScheme", options =>
                 {
-                    options.TokenValidationParameters = new TokenValidationParameters
+                    options.Cookie.HttpOnly = true;
+                    options.Cookie.Name = "Auth";
+                    options.Events.OnRedirectToLogin = p =>
                     {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = Configuration["Jwt:Issuer"],
-                        ValidAudience = Configuration["Jwt:Issuer"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                        if (p.Request.Path.StartsWithSegments("/api") && p.Response.StatusCode == 200)
+                        {
+                            p.Response.StatusCode = 401;
+                        }
+
+                        return Task.CompletedTask;
+                    };
+
+                    options.Events.OnRedirectToAccessDenied = p =>
+                    {
+                        if (p.Request.Path.StartsWithSegments("/api") && p.Response.StatusCode == 200)
+                        {
+                            p.Response.StatusCode = 403;
+                        }
+
+                        return Task.CompletedTask;
                     };
                 });
+            //services.AddAuthorization(options =>
+            //{
+            //    options.AddPolicy("MustBeAdmin", p => p.RequireAuthenticatedUser().RequireRole(Role.Admin.ToString()));
+            //});
+                //.AddJwtBearer(options =>
+                //{
+                //    options.TokenValidationParameters = new TokenValidationParameters
+                //    {
+                //        ValidateIssuer = true,
+                //        ValidateAudience = true,
+                //        ValidateLifetime = true,
+                //        ValidateIssuerSigningKey = true,
+                //        ValidIssuer = Configuration["Jwt:Issuer"],
+                //        ValidAudience = Configuration["Jwt:Issuer"],
+                //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                //    };
+                //});
 
             services.AddMvc()
                 .AddJsonOptions(options =>
@@ -65,7 +95,7 @@ namespace SurveyIT
             builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), builder.Services);
             builder.AddEntityFrameworkStores<SurveyIT.DB.MyDbContext>().AddDefaultTokenProviders();
 
-
+            services.AddScoped<RoleManager<IdentityRole>>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

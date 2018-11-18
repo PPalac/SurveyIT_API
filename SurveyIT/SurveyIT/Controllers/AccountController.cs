@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -48,14 +49,16 @@ namespace SurveyIT.Controllers
             {
                 return BadRequest();
             }
-
+            
             var user = await authService.Authenticate(login);
 
             if (user != null)
             {
-                var token = authService.Buildtoken(user);
+                var principal = authService.Login(user);
 
-                return Ok(token);
+                await HttpContext.SignInAsync(principal);
+
+                return Ok();
             }
 
             return Unauthorized();
