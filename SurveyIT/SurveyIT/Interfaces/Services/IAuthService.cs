@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using SurveyIT.Models;
 using SurveyIT.Models.DBModels;
 
@@ -10,6 +11,6 @@ namespace SurveyIT.Interfaces.Services
 
         Task<Users> Authenticate(LoginModel login);
 
-        string Buildtoken(Users user);
+        ClaimsPrincipal Login(Users user);
     }
 }

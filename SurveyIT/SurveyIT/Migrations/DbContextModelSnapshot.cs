@@ -6,11 +6,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using SurveyIT.DB;
+using SurveyIT.Enums;
 using System;
 
 namespace SurveyIT.Migrations
 {
-    [DbContext(typeof(DB.MyDbContext))]
+    [DbContext(typeof(MyDbContext))]
     partial class DbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -128,30 +129,140 @@ namespace SurveyIT.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("SurveyIT.Models.DBModels.Respondent", b =>
+            modelBuilder.Entity("SurveyIT.Models.DBModels.Answers", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("GroupId");
+                    b.Property<string>("Content");
 
-                    b.Property<string>("IdentityId");
+                    b.Property<int>("Type");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Answers");
+                });
+
+            modelBuilder.Entity("SurveyIT.Models.DBModels.Answers_List", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("AnswerId");
+
+                    b.Property<int?>("QuestionId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnswerId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("Answers_List");
+                });
+
+            modelBuilder.Entity("SurveyIT.Models.DBModels.Groups", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("SurveyIT.Models.DBModels.GroupsLink", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("GroupId");
 
                     b.Property<string>("UserId");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("GroupId");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("Respondents");
+                    b.ToTable("GroupsLink");
                 });
 
-            modelBuilder.Entity("SurveyIT.Models.DBModels.User", b =>
+            modelBuilder.Entity("SurveyIT.Models.DBModels.Questions", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Content")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Questions");
+                });
+
+            modelBuilder.Entity("SurveyIT.Models.DBModels.Questions_List", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("QuestionId");
+
+                    b.Property<int?>("SurveyId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("SurveyId");
+
+                    b.ToTable("Questions_List");
+                });
+
+            modelBuilder.Entity("SurveyIT.Models.DBModels.Surveys", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("End_Date");
+
+                    b.Property<DateTime>("Start_Date");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Surveys");
+                });
+
+            modelBuilder.Entity("SurveyIT.Models.DBModels.Surveys_List", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("GroupId");
+
+                    b.Property<int?>("SurveyId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("SurveyId");
+
+                    b.ToTable("Surveys_List");
+                });
+
+            modelBuilder.Entity("SurveyIT.Models.DBModels.Users", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("AccessFailedCount");
+
+                    b.Property<DateTime>("BOD");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
@@ -161,9 +272,11 @@ namespace SurveyIT.Migrations
 
                     b.Property<bool>("EmailConfirmed");
 
-                    b.Property<string>("FirstName");
+                    b.Property<string>("FirstName")
+                        .IsRequired();
 
-                    b.Property<string>("LastName");
+                    b.Property<string>("LastName")
+                        .IsRequired();
 
                     b.Property<bool>("LockoutEnabled");
 
@@ -180,6 +293,8 @@ namespace SurveyIT.Migrations
                     b.Property<string>("PhoneNumber");
 
                     b.Property<bool>("PhoneNumberConfirmed");
+
+                    b.Property<int>("Role");
 
                     b.Property<string>("SecurityStamp");
 
@@ -211,7 +326,7 @@ namespace SurveyIT.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("SurveyIT.Models.DBModels.User")
+                    b.HasOne("SurveyIT.Models.DBModels.Users")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -219,7 +334,7 @@ namespace SurveyIT.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("SurveyIT.Models.DBModels.User")
+                    b.HasOne("SurveyIT.Models.DBModels.Users")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -232,7 +347,7 @@ namespace SurveyIT.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("SurveyIT.Models.DBModels.User")
+                    b.HasOne("SurveyIT.Models.DBModels.Users")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -240,17 +355,54 @@ namespace SurveyIT.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("SurveyIT.Models.DBModels.User")
+                    b.HasOne("SurveyIT.Models.DBModels.Users")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("SurveyIT.Models.DBModels.Respondent", b =>
+            modelBuilder.Entity("SurveyIT.Models.DBModels.Answers_List", b =>
                 {
-                    b.HasOne("SurveyIT.Models.DBModels.User", "User")
-                        .WithMany()
+                    b.HasOne("SurveyIT.Models.DBModels.Answers", "Answer")
+                        .WithMany("AnswerList")
+                        .HasForeignKey("AnswerId");
+
+                    b.HasOne("SurveyIT.Models.DBModels.Questions", "Question")
+                        .WithMany("AnswerList")
+                        .HasForeignKey("QuestionId");
+                });
+
+            modelBuilder.Entity("SurveyIT.Models.DBModels.GroupsLink", b =>
+                {
+                    b.HasOne("SurveyIT.Models.DBModels.Groups", "Group")
+                        .WithMany("GroupsLink")
+                        .HasForeignKey("GroupId");
+
+                    b.HasOne("SurveyIT.Models.DBModels.Users", "User")
+                        .WithMany("GroupsLink")
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("SurveyIT.Models.DBModels.Questions_List", b =>
+                {
+                    b.HasOne("SurveyIT.Models.DBModels.Questions", "Question")
+                        .WithMany("QuestionsList")
+                        .HasForeignKey("QuestionId");
+
+                    b.HasOne("SurveyIT.Models.DBModels.Surveys", "Survey")
+                        .WithMany("QuestionsList")
+                        .HasForeignKey("SurveyId");
+                });
+
+            modelBuilder.Entity("SurveyIT.Models.DBModels.Surveys_List", b =>
+                {
+                    b.HasOne("SurveyIT.Models.DBModels.Groups", "Group")
+                        .WithMany("SurveysList")
+                        .HasForeignKey("GroupId");
+
+                    b.HasOne("SurveyIT.Models.DBModels.Surveys", "Survey")
+                        .WithMany("SurveysList")
+                        .HasForeignKey("SurveyId");
                 });
 #pragma warning restore 612, 618
         }

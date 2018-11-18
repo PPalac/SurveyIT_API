@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SurveyIT.Attributes;
 using SurveyIT.Enums;
 using SurveyIT.Interfaces.Services;
@@ -66,16 +67,16 @@ namespace SurveyIT.Controllers
             return BadRequest(result.Message);
         }
 
-        //[Auth(Role.Admin)]
+        [Auth(Roles = "Admin")]
         [HttpGet("Display")]
-        public JsonResult DisplayAll()
+        public async Task<IActionResult> DisplayAll()
         {
             var result = groupService.GetAllGroups();
             
             if (result != null)
-                return Json(result);
+                return Ok(Json(result));
 
-            return Json("Błąd wyświetlania");
+            return BadRequest("Błąd wyświetlania");
 
         }
     }
