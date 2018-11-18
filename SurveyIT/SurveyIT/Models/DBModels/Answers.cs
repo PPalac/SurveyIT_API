@@ -15,9 +15,6 @@ namespace SurveyIT.Models.DBModels
 
         public string Content { get; set; }
 
-        [Required]
-        public TypeAnswers Type { get; set; }
-
         public List<Answers_List> AnswerList { get; set; }
     }
 }

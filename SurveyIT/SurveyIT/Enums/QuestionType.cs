@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SurveyIT.Enums
 {
-    public enum TypeAnswers
+    public enum QuestionType
     {
         Open,
         Multiple,
