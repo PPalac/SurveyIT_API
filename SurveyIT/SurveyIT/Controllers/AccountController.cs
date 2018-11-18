@@ -18,6 +18,8 @@ namespace SurveyIT.Controllers
     public class AccountController : Controller
     {
         private IAuthService authService;
+        private IAccountService accountService;
+
 
         public AccountController(IAuthService authService)
         {
@@ -40,6 +42,33 @@ namespace SurveyIT.Controllers
             else
                 return BadRequest("Nie zarejestrowano użytkownika");
         }
+
+
+        public AccountController(IAccountService accountService)
+        {
+            this.accountService = accountService;
+        }
+
+
+
+        [AllowAnonymous]
+        [HttpPost("Update")]
+        public async Task<IActionResult> UpdateUser([FromBody] UserModel userData)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var upuser = await accountService.UpdateUser(userData);
+
+            if (upuser.StateMessage==CommonResultState.OK)
+                return Ok("Account Updated");
+            else
+                return BadRequest("Nie zaktualizowano użytkownika");
+        }
+
+
 
         [AllowAnonymous]
         [HttpPost("Auth")]
