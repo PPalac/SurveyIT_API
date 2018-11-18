@@ -34,5 +34,32 @@ namespace SurveyIT.Controllers
 
             return BadRequest(result.Message);
         }
+
+        //[Auth(Role.Admin)]
+        [HttpGet("DisplayAll")]
+        public JsonResult DisplayAll()
+        {
+            var result = surveyService.GetAllSurveys();
+
+            if (result != null)
+                return Json(result);
+
+            return Json("Błąd wyświetlania");
+        }
+
+        //[Auth(Role.Admin)]
+        [HttpPost("DisplayOne")]
+        public JsonResult DisplayOneSurvey([FromBody]string surveyId)
+        {
+            if (!ModelState.IsValid)
+                return Json("Błąd wyświetlania");
+
+            var result = surveyService.GetOneSurvey(surveyId);
+
+            if (result != null)
+                return Json(result);
+
+            return Json("Błąd wyświetlania");
+        }
     }
 }
