@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SurveyIT.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -18,5 +19,8 @@ namespace SurveyIT.Models.DBModels
         public List<Questions_List> QuestionsList { get; set; }
 
         public List<Answers_List> AnswerList { get; set; }
+
+        [Required]
+        public QuestionType QuestionType { get; set; }
     }
 }

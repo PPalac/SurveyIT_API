@@ -70,10 +70,15 @@ namespace SurveyIT
                 //    };
                 //});
 
-            services.AddMvc();
+            services.AddMvc()
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.DateFormatString = "dd-MM-yyyy";
+                });
 
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IGroupService, GroupService>();
+            services.AddScoped<ISurveyService, SurveyService>();
 
             services.AddDbContext<SurveyIT.DB.MyDbContext>(options =>
             options.UseSqlServer(Configuration["ConnectionString"],

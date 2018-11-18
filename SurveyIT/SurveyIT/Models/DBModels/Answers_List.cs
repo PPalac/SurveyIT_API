@@ -12,6 +12,9 @@ namespace SurveyIT.Models.DBModels
         [Key]
         public int Id { get; set; }
 
+        [ForeignKey("Question")]
+        public int QuestionId { get; set; }
+
         public Questions Question { get; set; }
 
         public Answers Answer { get; set; }
