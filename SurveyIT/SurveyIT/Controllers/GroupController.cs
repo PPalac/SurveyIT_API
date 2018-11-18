@@ -1,13 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SurveyIT.Attributes;
 using SurveyIT.Enums;
 using SurveyIT.Interfaces.Services;
 using SurveyIT.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SurveyIT.Controllers
 {
@@ -22,7 +18,7 @@ namespace SurveyIT.Controllers
             this.groupService = groupService;
         }
 
-        //[Auth(Role.Admin)]
+        [Auth(Role.Admin)]
         [HttpPost("Create")]
         public async Task<IActionResult> CreateGroup([FromBody]GroupModel group)
         {
@@ -37,7 +33,7 @@ namespace SurveyIT.Controllers
             return BadRequest(result.Message);
         }
 
-        //[Auth(Role.Admin)]
+        [Auth(Role.Admin)]
         [HttpPost("Delete")]
         public async Task<IActionResult> DeleteGroup([FromBody]GroupModel group)
         {
@@ -52,7 +48,7 @@ namespace SurveyIT.Controllers
             return BadRequest(result.Message);
         }
 
-        //[Auth(Role.Admin)]
+        [Auth(Role.Admin)]
         [HttpPost("Edit")]
         public async Task<IActionResult> EditGRoup([FromBody]GroupModel group, string newGroupName) //todo: dodac id do groupmodel
         {

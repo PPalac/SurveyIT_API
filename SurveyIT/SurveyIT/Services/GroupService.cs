@@ -70,7 +70,6 @@ namespace SurveyIT.Services
                     }
 
                     dbContext.Groups.Add(newGroup);
-
                     await dbContext.SaveChangesAsync();
                     validationResult.Message = "Pomyslnie dodano grupe";
                     return validationResult;

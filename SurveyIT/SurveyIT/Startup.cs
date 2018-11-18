@@ -12,6 +12,7 @@ using SurveyIT.Models.DBModels;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using SurveyIT.Enums;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 
 namespace SurveyIT
 {
@@ -56,19 +57,28 @@ namespace SurveyIT
             //{
             //    options.AddPolicy("MustBeAdmin", p => p.RequireAuthenticatedUser().RequireRole(Role.Admin.ToString()));
             //});
-                //.AddJwtBearer(options =>
-                //{
-                //    options.TokenValidationParameters = new TokenValidationParameters
-                //    {
-                //        ValidateIssuer = true,
-                //        ValidateAudience = true,
-                //        ValidateLifetime = true,
-                //        ValidateIssuerSigningKey = true,
-                //        ValidIssuer = Configuration["Jwt:Issuer"],
-                //        ValidAudience = Configuration["Jwt:Issuer"],
-                //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
-                //    };
-                //});
+            //.AddJwtBearer(options =>
+            //{
+            //    options.TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        ValidateIssuer = true,
+            //        ValidateAudience = true,
+            //        ValidateLifetime = true,
+            //        ValidateIssuerSigningKey = true,
+            //        ValidIssuer = Configuration["Jwt:Issuer"],
+            //        ValidAudience = Configuration["Jwt:Issuer"],
+            //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+            //    };
+            //});
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builderr => builderr.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+            });
 
             services.AddMvc()
                 .AddJsonOptions(options =>
@@ -106,9 +116,12 @@ namespace SurveyIT
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseAuthentication();
+            app.UseCors("CorsPolicy");
 
+            app.UseAuthentication();
+            
             app.UseMvc();
+
         }
     }
 }
