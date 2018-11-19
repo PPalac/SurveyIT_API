@@ -1,7 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SurveyIT.Attributes;
 using SurveyIT.Enums;
 using SurveyIT.Interfaces.Services;
 using SurveyIT.Models;
@@ -73,7 +77,7 @@ namespace SurveyIT.Controllers
             {
                 return BadRequest();
             }
-            
+
             var user = await authService.Authenticate(login);
 
             if (user != null)
@@ -82,10 +86,19 @@ namespace SurveyIT.Controllers
 
                 await HttpContext.SignInAsync(principal);
 
-                return Ok();
+                return Ok(user.Role.ToString());
             }
 
             return Unauthorized();
+        }
+
+        [Auth(Role.User, Role.Admin)]
+        [HttpGet("Logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            return Ok();
         }
     }
 }
