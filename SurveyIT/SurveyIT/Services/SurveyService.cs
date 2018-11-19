@@ -165,8 +165,13 @@ namespace SurveyIT.Services
                             newQuesion.QuestionType = question.QuestionType;
                             newQuesion.QuestionsList = new List<Questions_List>();
 
+                            var questionExist = dbContext.Questions.FirstOrDefault(x => x.Content == newQuesion.Content);
+                            if (questionExist == null)
+                                dbContext.Questions.Add(newQuesion);
+                            else
+                                newQuesion.Id = questionExist.Id;
+
                             newQuesion.QuestionsList.Add(new Questions_List { SurveyId = newSurvey.Id });
-                            dbContext.Questions.Add(newQuesion);
 
                             if (question.Answers != null)
                             {
@@ -175,6 +180,12 @@ namespace SurveyIT.Services
                                     var newAnswer = new Answers();
                                     newAnswer.Content = answer.Content;
                                     newAnswer.AnswerList = new List<Answers_List>();
+
+                                    var answersExist = dbContext.Answers.FirstOrDefault(x => x.Content == newAnswer.Content);
+                                    if (answersExist == null)
+                                        dbContext.Answers.Add(newAnswer);
+                                    else
+                                        newAnswer.Id = answersExist.Id;
 
                                     newAnswer.AnswerList.Add(new Answers_List { QuestionId = newQuesion.Id });
                                     dbContext.Answers.Add(newAnswer);
