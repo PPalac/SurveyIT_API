@@ -70,7 +70,6 @@ namespace SurveyIT.Services
                     }
 
                     dbContext.Groups.Add(newGroup);
-
                     await dbContext.SaveChangesAsync();
                     validationResult.Message = "Pomyslnie dodano grupe";
                     return validationResult;
@@ -177,6 +176,43 @@ namespace SurveyIT.Services
             catch (Exception)
             {
                 throw new Exception("Błąd wyswietlania");
+            }
+        }
+
+        public GroupModel GetOneGroup(string groupId)
+        {
+            try
+            {
+                if(!string.IsNullOrEmpty(groupId))
+                {
+                    var group = dbContext.Groups.FirstOrDefault(g => g.Id.ToString() == groupId);
+
+                    if(group!=null)
+                    {
+                        GroupModel newGroupModel = new GroupModel();
+                        newGroupModel.Id = group.Id;
+                        newGroupModel.Name = group.Name;
+
+                        List<string> userId = new List<string>();
+
+                        var groupLink = dbContext.GroupsLink.Where(x => x.Group.Id == group.Id);
+
+                        foreach (var user in groupLink)
+                        {
+                            userId.Add(user.User.Id);
+                        }
+
+                        newGroupModel.UserId = userId;
+
+                        return newGroupModel;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+                throw new Exception("Błąd");
             }
         }
     }

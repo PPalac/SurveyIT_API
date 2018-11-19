@@ -13,6 +13,12 @@ namespace SurveyIT.Interfaces.Services
 
         Task<CommonResult> AddSurvey(SurveyModel surveyModel);
 
-        Task<CommonResult> DeleteSurvey(SurveyModel surveyModel);
+        Task<CommonResult> AssignSurveysToGroup(List<string> surveyId, List<string> groupId);
+
+        Task<CommonResult> UnAssignSurveysInGroup(List<string> surveyId, List<string> groupId);
+
+        SortedList<string, string> GetAllSurveys();
+
+        SurveyModel GetOneSurvey(string surveyId);
     }
 }

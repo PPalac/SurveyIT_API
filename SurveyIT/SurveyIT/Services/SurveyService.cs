@@ -165,8 +165,13 @@ namespace SurveyIT.Services
                             newQuesion.QuestionType = question.QuestionType;
                             newQuesion.QuestionsList = new List<Questions_List>();
 
+                            var questionExist = dbContext.Questions.FirstOrDefault(x => x.Content == newQuesion.Content);
+                            if (questionExist == null)
+                                dbContext.Questions.Add(newQuesion);
+                            else
+                                newQuesion.Id = questionExist.Id;
+
                             newQuesion.QuestionsList.Add(new Questions_List { SurveyId = newSurvey.Id });
-                            dbContext.Questions.Add(newQuesion);
 
                             if (question.Answers != null)
                             {
@@ -175,6 +180,12 @@ namespace SurveyIT.Services
                                     var newAnswer = new Answers();
                                     newAnswer.Content = answer.Content;
                                     newAnswer.AnswerList = new List<Answers_List>();
+
+                                    var answersExist = dbContext.Answers.FirstOrDefault(x => x.Content == newAnswer.Content);
+                                    if (answersExist == null)
+                                        dbContext.Answers.Add(newAnswer);
+                                    else
+                                        newAnswer.Id = answersExist.Id;
 
                                     newAnswer.AnswerList.Add(new Answers_List { QuestionId = newQuesion.Id });
                                     dbContext.Answers.Add(newAnswer);
@@ -196,9 +207,199 @@ namespace SurveyIT.Services
             }
         }
 
-        public Task<CommonResult> DeleteSurvey(SurveyModel surveyModel)
+
+        public async Task<CommonResult> AssignSurveysToGroup(List<string> surveyId, List<string> groupId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (surveyId != null || groupId != null)
+                {
+                    foreach (var survey in surveyId)
+                    {
+                        var surveyDB = dbContext.Surveys.FirstOrDefault(x => x.Id.ToString() == survey);
+
+                        if (surveyDB != null)
+                        {
+                            foreach (var group in groupId)
+                            {
+                                var groupDB = dbContext.Groups.FirstOrDefault(g => g.Id.ToString() == group);
+
+                                if (groupDB != null)
+                                {
+                                    var surveyList = dbContext.Surveys_List.Where(x => x.Group.Id == groupDB.Id && x.Survey.Id == surveyDB.Id);
+
+                                    if(surveyList==null)
+                                        dbContext.Surveys_List.Add(new Surveys_List { Group = groupDB, Survey = surveyDB });
+                                }
+                                else
+                                {
+                                    return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie grupy istnieja");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie ankiety istnieja");
+                        }
+                    }
+
+
+                    await dbContext.SaveChangesAsync();
+                    return new CommonResult(Enums.CommonResultState.OK, "Przypisanie poprawne");
+                }
+
+                return new CommonResult(Enums.CommonResultState.Warning, "Brak obiektow do przypisania");
+            }
+            catch (Exception ex)
+            {
+                return new CommonResult(Enums.CommonResultState.Error, "Blad podczas przypisywania");
+            }
+        }
+
+        public SurveyModel GetOneSurvey(string surveyId)
+        {
+            try
+            {
+                if(!string.IsNullOrEmpty(surveyId))
+                {
+                    var survey = dbContext.Surveys.ToList().FirstOrDefault(s => s.Id.ToString() == surveyId);
+
+                    if(survey!=null)
+                    {
+                        SurveyModel surveyModel = new SurveyModel();
+                        surveyModel.End_date = survey.End_Date;
+                        surveyModel.Start_date = survey.Start_Date;
+                        surveyModel.Id = survey.Id;
+                        surveyModel.Name = survey.Name;
+                        surveyModel.Questions = new List<QuestionModel>();
+
+                        var questionLink = dbContext.Questions_List.ToList().Where(q => q.Survey.Id == survey.Id);
+
+                        if(questionLink!=null)
+                        {
+                            foreach (var qLink in questionLink)
+                            {
+                                var question = dbContext.Questions.ToList().Where(q => q.Id == qLink.Question.Id);
+                                if (question!=null)
+                                {
+                                    foreach (var oneQuestion in question)
+                                    {
+                                        QuestionModel questionModel = new QuestionModel();
+                                        questionModel.Content = oneQuestion.Content;
+                                        questionModel.QuestionType = oneQuestion.QuestionType;
+                                        questionModel.Id = oneQuestion.Id;
+                                        questionModel.Answers = new List<AnswerModel>();
+
+                                        var answerLink = dbContext.Answers_List.ToList().Where(a => a.Question.Id == oneQuestion.Id);
+
+                                        if(answerLink!=null)
+                                        {
+                                            foreach (var aLink in answerLink)
+                                            {
+                                                var answer = dbContext.Answers.ToList().Where(a => a.Id == aLink.Answer.Id);
+
+                                                foreach (var an in answer)
+                                                {
+                                                    AnswerModel answerModel = new AnswerModel();
+                                                    answerModel.Content = an.Content;
+                                                    answerModel.Id = an.Id;
+
+                                                    questionModel.Answers.Add(answerModel);
+                                                }
+                                            }
+                                        }
+
+                                        surveyModel.Questions.Add(questionModel);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                        return surveyModel;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Błąd wyswietlania");
+            }
+        }
+
+        public async Task<CommonResult> UnAssignSurveysInGroup(List<string> surveyId, List<string> groupId)
+        {
+            try
+            {
+                if (surveyId != null || groupId != null)
+                {
+                    foreach (var survey in surveyId)
+                    {
+                        var surveyDB = dbContext.Surveys.FirstOrDefault(x => x.Id.ToString() == survey);
+                        if (surveyDB != null)
+                        {
+                            foreach (var group in groupId)
+                            {
+                                var groupDB = dbContext.Groups.FirstOrDefault(g => g.Id.ToString() == group);
+
+                                if (groupDB != null)
+                                {
+                                    var surveyList = dbContext.Surveys_List.Where(x => x.Group.Id == groupDB.Id && x.Survey.Id == surveyDB.Id);
+
+                                    if (surveyList != null)
+                                        dbContext.Surveys_List.Remove(new Surveys_List { Group = groupDB, Survey = surveyDB });
+                                }
+                                else
+                                {
+                                    return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie grupy istnieja");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie ankiety istnieja");
+                        }
+                    }
+
+
+                    await dbContext.SaveChangesAsync();
+                    return new CommonResult(Enums.CommonResultState.OK, "Przypisanie poprawne");
+                }
+
+                return new CommonResult(Enums.CommonResultState.Warning, "Brak obiektow do przypisania");
+            }
+            catch (Exception ex)
+            {
+                return new CommonResult(Enums.CommonResultState.Error, "Blad podczas przypisywania");
+            }
+        }
+
+        public SortedList<string, string> GetAllSurveys()
+        {
+            try
+            {
+                SortedList<string, string> surveyList = new SortedList<string, string>();
+                var surveys = dbContext.Surveys.ToList();
+
+                if (surveys != null)
+                {
+                    foreach (var survey in surveys)
+                    {
+                        surveyList.Add(survey.Id.ToString(), survey.Name);
+                    }
+
+                    return surveyList;
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+                throw new Exception("Błąd wyswietlania");
+            }
         }
     }
 }

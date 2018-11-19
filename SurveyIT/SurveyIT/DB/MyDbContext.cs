@@ -24,6 +24,9 @@ namespace SurveyIT.DB
         public DbSet<Questions_List> Questions_List { get; set; }
         public DbSet<Surveys> Surveys { get; set; }
         public DbSet<Surveys_List> Surveys_List { get; set; }
-        public DbSet<Users> New_Users { get; set; }
+        public DbSet<Users> Users { get; set; }
+        public DbSet<UsersLink> UsersLink { get; set; }
+        public DbSet<UserAnswers> UserAnswers { get; set; }
+        public DbSet<UserAnswers_List> UserAnswers_Lists { get; set; }
     }
 }
