@@ -13,5 +13,8 @@ namespace SurveyIT.Interfaces.Services
     {
         Task<CommonResult> UpdateUser(UserModel user);
 
+        List<UserModel> GetAllUsersWithRoleUser();
+
+        UserModel GetOneUserById(string userId);
     }
 }

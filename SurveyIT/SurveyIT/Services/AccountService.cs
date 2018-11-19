@@ -85,5 +85,59 @@ namespace SurveyIT.Services
                 return new CommonResult(CommonResultState.Error, "Błąd podczas update'owania danych użytkownika");
             }
         }
+
+        public List<UserModel> GetAllUsersWithRoleUser()
+        {
+            try
+            {
+                List<UserModel> userList = new List<UserModel>();
+                var users = dbContext.Users.ToList().Where(x=>x.Role==Role.User);
+
+                if (users != null)
+                {
+                    foreach (var user in users)
+                    {
+                        UserModel newUserModel = new UserModel();
+                        newUserModel.Username = user.UserName;
+                        newUserModel.Id = int.Parse(user.Id);
+                        userList.Add(newUserModel);
+                    }
+
+                    return userList;
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+                throw new Exception("Błąd wyswietlania");
+            }
+        }
+
+        public UserModel GetOneUserById(string userId)
+        {
+            try
+            {
+                UserModel userModel = new UserModel();
+                var user = dbContext.Users.ToList().FirstOrDefault(x => x.Id == userId);
+
+                if(user!=null)
+                {
+                    userModel.Email = user.Email;
+                    userModel.FirstName = user.FirstName;
+                    userModel.Id = int.Parse(user.Id);
+                    userModel.LastName = user.LastName;
+                    userModel.Username = user.UserName;
+
+                    return userModel;
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+                throw new Exception("Błąd wyswietlania");
+            }
+        }
     }
 }
