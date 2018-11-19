@@ -100,7 +100,7 @@ namespace SurveyIT.Services
                     {
                         UserModel newUserModel = new UserModel();
                         newUserModel.Username = user.UserName;
-                        newUserModel.Id = int.Parse(user.Id);
+                        newUserModel.Id = user.Id;
                         userList.Add(newUserModel);
                     }
 
@@ -126,7 +126,7 @@ namespace SurveyIT.Services
                 {
                     userModel.Email = user.Email;
                     userModel.FirstName = user.FirstName;
-                    userModel.Id = int.Parse(user.Id);
+                    userModel.Id = user.Id;
                     userModel.LastName = user.LastName;
                     userModel.Username = user.UserName;
 
