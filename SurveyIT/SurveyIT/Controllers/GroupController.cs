@@ -75,5 +75,18 @@ namespace SurveyIT.Controllers
             return BadRequest("Błąd wyświetlania");
 
         }
+
+        [Auth(Roles = "Admin")]
+        [HttpGet("Display/OneGroup")]
+        public async Task<IActionResult> DisplayOneGroup([FromBody]string groupId)
+        {
+            var result = groupService.GetOneGroup(groupId);
+
+            if (result != null)
+                return Ok(Json(result));
+
+            return BadRequest("Błąd wyświetlania");
+
+        }
     }
 }
