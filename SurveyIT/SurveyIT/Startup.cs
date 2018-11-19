@@ -1,19 +1,14 @@
-﻿using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using SurveyIT.Interfaces.Services;
-using SurveyIT.Services;
 using SurveyIT.Models.DBModels;
-using Microsoft.AspNetCore.Identity;
-using System.Threading.Tasks;
-using SurveyIT.Enums;
-using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using SurveyIT.Services;
 
 namespace SurveyIT
 {
@@ -90,6 +85,7 @@ namespace SurveyIT
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<ISurveyService, SurveyService>();
+            services.AddScoped<IAccountService, AccountService>();
 
             services.AddDbContext<SurveyIT.DB.MyDbContext>(options =>
             options.UseSqlServer(Configuration["ConnectionString"],
