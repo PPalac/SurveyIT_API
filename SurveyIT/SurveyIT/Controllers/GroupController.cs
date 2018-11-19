@@ -72,12 +72,7 @@ namespace SurveyIT.Controllers
             if (result != null)
                 return Json(result);
 
-<<<<<<< HEAD
             return Json("Błąd wyświetlania");
-
-=======
-            return BadRequest("Błąd wyświetlania");
->>>>>>> dd536a3bd75bc74d390c02fafe61ee9023e20b21
         }
 
         [Auth(Roles = "Admin")]
