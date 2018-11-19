@@ -65,27 +65,27 @@ namespace SurveyIT.Controllers
 
         [Auth(Role.Admin)]
         [HttpGet("Display")]
-        public async Task<IActionResult> DisplayAll()
+        public JsonResult DisplayAll()
         {
             var result = groupService.GetAllGroups();
-            
-            if (result != null)
-                return Ok(Json(result));
 
-            return BadRequest("Błąd wyświetlania");
+            if (result != null)
+                return Json(result);
+
+            return Json("Błąd wyświetlania");
 
         }
 
         [Auth(Roles = "Admin")]
-        [HttpGet("Display/OneGroup")]
-        public async Task<IActionResult> DisplayOneGroup([FromBody]string groupId)
+        [HttpPost("Display/OneGroup")]
+        public JsonResult DisplayOneGroup([FromBody]string groupId)
         {
             var result = groupService.GetOneGroup(groupId);
 
             if (result != null)
-                return Ok(Json(result));
+                return Json(result);
 
-            return BadRequest("Błąd wyświetlania");
+            return Json("Błąd wyświetlania");
 
         }
     }
