@@ -91,5 +91,30 @@ namespace SurveyIT.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return Ok();
         }
+
+        //[Auth(Role.Admin)]
+        [HttpGet("DisplayUsers")]
+        public JsonResult DisplayAllUser()
+        {
+            var result = accountService.GetAllUsersWithRoleUser();
+
+            if (result != null)
+                return Json(result);
+
+            return Json("Błąd wyświetlania");
+        }
+
+        //[Auth(Roles = "Admin")]
+        [HttpPost("DisplayUsers/User")]
+        public JsonResult DisplayOneUser([FromBody]string userId)
+        {
+            var result = accountService.GetOneUserById(userId);
+
+            if (result != null)
+                return Json(result);
+
+            return Json("Błąd wyświetlania");
+
+        }
     }
 }

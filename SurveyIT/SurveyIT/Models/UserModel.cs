@@ -7,6 +7,6 @@ namespace SurveyIT.Models
 {
     public class UserModel : RegistrationModel
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
     }
 }
