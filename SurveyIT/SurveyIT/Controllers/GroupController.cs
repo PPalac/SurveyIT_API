@@ -63,7 +63,7 @@ namespace SurveyIT.Controllers
             return BadRequest(result.Message);
         }
 
-        [Auth(Roles = "Admin")]
+        [Auth(Role.Admin)]
         [HttpGet("Display")]
         public async Task<IActionResult> DisplayAll()
         {
