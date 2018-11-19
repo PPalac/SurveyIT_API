@@ -18,11 +18,11 @@ namespace SurveyIT.Controllers
     {
         private IAuthService authService;
         private IAccountService accountService;
-
-
-        public AccountController(IAuthService authService)
+        
+        public AccountController(IAuthService authService, IAccountService accountService)
         {
             this.authService = authService;
+            this.accountService = accountService;
         }
 
         [AllowAnonymous]
@@ -41,14 +41,6 @@ namespace SurveyIT.Controllers
             else
                 return BadRequest("Nie zarejestrowano użytkownika");
         }
-
-
-        public AccountController(IAccountService accountService)
-        {
-            this.accountService = accountService;
-        }
-
-
 
         [AllowAnonymous]
         [HttpPost("Update")]

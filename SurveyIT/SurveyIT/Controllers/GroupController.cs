@@ -73,7 +73,6 @@ namespace SurveyIT.Controllers
                 return Ok(Json(result));
 
             return BadRequest("Błąd wyświetlania");
-
         }
     }
 }
