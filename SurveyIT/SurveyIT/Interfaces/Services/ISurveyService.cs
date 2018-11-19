@@ -15,6 +15,8 @@ namespace SurveyIT.Interfaces.Services
 
         Task<CommonResult> AssignSurveysToGroup(List<string> surveyId, List<string> groupId);
 
+        Task<CommonResult> UnAssignSurveysInGroup(List<string> surveyId, List<string> groupId);
+
         SortedList<string, string> GetAllSurveys();
 
         SurveyModel GetOneSurvey(string surveyId);
