@@ -27,20 +27,36 @@ namespace SurveyIT.Services
                     {
                         var group = dbContext.Groups.FirstOrDefault(x => x.Id.ToString() == groups);
 
-                        foreach (var users in userId)
+                        if(group!=null)
                         {
-                            var user = dbContext.Users.FirstOrDefault(u => u.Id == users);
-
-                            var groupLink = dbContext.GroupsLink.Where(x => x.User.Id == user.Id && x.Group.Id == group.Id);
-
-                            if(groupLink==null)
+                            foreach (var users in userId)
                             {
-                                dbContext.GroupsLink.Add(new Models.DBModels.GroupsLink { User = user, Group = group });
+                                var user = dbContext.Users.FirstOrDefault(u => u.Id == users);
+
+                                if(user!=null)
+                                {
+                                    var groupLink = dbContext.GroupsLink.Where(x => x.User.Id == user.Id && x.Group.Id == group.Id);
+
+                                    if (groupLink == null)
+                                    {
+                                        dbContext.GroupsLink.Add(new Models.DBModels.GroupsLink { User = user, Group = group });
+                                    }
+                                }
+                                else
+                                {
+                                    return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie obiekty istnieja");
+                                }
                             }
+                            dbContext.SaveChanges();
+                            return new CommonResult(Enums.CommonResultState.OK, "Przypisanie przebieglo pomyslnie");
+                        }
+                        else
+                        {
+                            return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie obiekty istnieja");
                         }
                     }
 
-                    return new CommonResult(Enums.CommonResultState.OK, "Przypisanie przebieglo pomyslnie");
+                    
                 }
 
                 return new CommonResult(Enums.CommonResultState.Warning, "Podane obiekty nie istnieja");
@@ -136,19 +152,35 @@ namespace SurveyIT.Services
                     {
                         var group = dbContext.Groups.FirstOrDefault(x => x.Id.ToString() == groups);
 
-                        foreach (var users in userId)
+                        if (group != null)
                         {
-                            var user = dbContext.Users.FirstOrDefault(u => u.Id == users);
-                            var groupLink = dbContext.GroupsLink.Where(x => x.User.Id == user.Id && x.Group.Id == group.Id);
-
-                            if (groupLink != null)
+                            foreach (var users in userId)
                             {
-                                dbContext.GroupsLink.Remove(new Models.DBModels.GroupsLink { User = user, Group = group });
+                                var user = dbContext.Users.FirstOrDefault(u => u.Id == users);
+
+                                if (user != null)
+                                {
+                                    var groupLink = dbContext.GroupsLink.Where(x => x.User.Id == user.Id && x.Group.Id == group.Id);
+
+                                    if (groupLink != null)
+                                    {
+                                        dbContext.GroupsLink.Remove(new Models.DBModels.GroupsLink { User = user, Group = group });
+                                    }
+                                }
+                                else
+                                {
+                                    return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie obiekty istnieja");
+                                }
                             }
+
+                            dbContext.SaveChanges();
+                            return new CommonResult(Enums.CommonResultState.OK, "Odprzypisanie przebieglo pomyslnie");
+                        }
+                        else
+                        {
+                            return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie obiekty istnieja");
                         }
                     }
-
-                    return new CommonResult(Enums.CommonResultState.OK, "Odprzypisanie przebieglo pomyslnie");
                 }
 
                 return new CommonResult(Enums.CommonResultState.Warning, "Podane obiekty nie istnieja");
