@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using SurveyIT.Enums;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace SurveyIT
 {
@@ -28,8 +29,8 @@ namespace SurveyIT
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication("FiverSecurityScheme")
-                .AddCookie("FiverSecurityScheme", options =>
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
                     options.Cookie.HttpOnly = true;
                     options.Cookie.Name = "Auth";

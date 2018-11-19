@@ -37,7 +37,7 @@ namespace SurveyIT.Services
             if (!result.Succeeded)
                 return false;
 
-            var addToRoleResult = await userManager.AddToRoleAsync(user, Role.Admin.ToString());
+            var addToRoleResult = await userManager.AddToRoleAsync(user, Role.User.ToString());
 
             if (!addToRoleResult.Succeeded)
                 return false;
