@@ -52,7 +52,7 @@ namespace SurveyIT.Controllers
 
                 await HttpContext.SignInAsync(principal);
 
-                return Ok();
+                return Ok(user.Role.ToString());
             }
 
             return Unauthorized();
