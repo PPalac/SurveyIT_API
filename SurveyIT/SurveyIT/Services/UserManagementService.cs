@@ -54,9 +54,7 @@ namespace SurveyIT.Services
                         {
                             return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie obiekty istnieja");
                         }
-                    }
-
-                    
+                    }                 
                 }
 
                 return new CommonResult(Enums.CommonResultState.Warning, "Podane obiekty nie istnieja");
