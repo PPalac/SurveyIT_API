@@ -21,6 +21,7 @@ namespace SurveyIT.Services
             this.dbContext = dbContext;
         }
 
+        #region ValidationRegion
         public CommonResult ValidationSurveyContent(SurveyModel surveyModel)
         {
             try
@@ -32,9 +33,9 @@ namespace SurveyIT.Services
                     if (resultValidationDate.StateMessage == CommonResultState.OK)
                     {
                         var resultValidationQuestion = ValidationQuestion(surveyModel);
-                        if(resultValidationQuestion.StateMessage==CommonResultState.OK)
+                        if (resultValidationQuestion.StateMessage == CommonResultState.OK)
                         {
-                            resultValidationQuestion.Message="Walidacja poprawna";
+                            resultValidationQuestion.Message = "Walidacja poprawna";
                             return resultValidationQuestion;
                         }
 
@@ -95,7 +96,7 @@ namespace SurveyIT.Services
             {
                 foreach (var question in surveyModel.Questions)
                 {
-                    if(!string.IsNullOrEmpty(question.Content))
+                    if (!string.IsNullOrEmpty(question.Content))
                     {
                         if (question.Answers != null)
                         {
@@ -103,7 +104,7 @@ namespace SurveyIT.Services
                             {
                                 foreach (var answer in question.Answers)
                                 {
-                                    if(string.IsNullOrEmpty(answer.Content))
+                                    if (string.IsNullOrEmpty(answer.Content))
                                     {
                                         return new CommonResult(CommonResultState.Warning, "Odpowiedz nie zawiera tekstu");
                                     }
@@ -114,20 +115,73 @@ namespace SurveyIT.Services
                             {
                                 return new CommonResult(CommonResultState.Warning, "Odpowiedz powinna byc pusta");
                             }
-                            
-                            return new CommonResult(CommonResultState.OK, "Walidacja pytan poprawna");
                         }
-
-                        return new CommonResult(CommonResultState.Warning, "Pytanie nie zawiera odpowiedzi");
+                        else 
+                            return new CommonResult(CommonResultState.Warning, "Pytanie nie zawiera odpowiedzi");
                     }
-
-                    return new CommonResult(CommonResultState.Warning, "Pytanie nie ma tresci");
+                    else
+                        return new CommonResult(CommonResultState.Warning, "Pytanie nie ma tresci");
 
                 }
- 
+
+                return new CommonResult(CommonResultState.OK, "Walidacja pytan poprawna");
             }
-            return new CommonResult(CommonResultState.Warning, "Ankieta nie zawiera pytan");
+            else
+                return new CommonResult(CommonResultState.Warning, "Ankieta nie zawiera pytan");
         }
+
+        public CommonResult ValidationFillQuestion(SurveyModel surveyModel)
+        {
+            if (surveyModel.Questions != null)
+            {
+                foreach (var question in surveyModel.Questions)
+                {
+                    if (!string.IsNullOrEmpty(question.Content))
+                    {
+                        if (question.Answers != null)
+                        {
+                            if (question.QuestionType == QuestionType.Single)
+                            {
+                                if (!(question.Answers.Count == 1 && !string.IsNullOrEmpty(question.Answers[0].Content)))
+                                    return new CommonResult(CommonResultState.Warning, "Bledna walidacja odpowiedzi");
+                            }
+                            else if (question.QuestionType == QuestionType.Open)
+                            {
+                                if (!(question.Answers.Count == 1 && !string.IsNullOrEmpty(question.Answers[0].Content)))
+                                {
+                                    return new CommonResult(CommonResultState.Warning, "Bledna walidacja odpowiedzi");
+                                }
+                            }
+                            else
+                            {
+                                if (!(question.Answers.Count > 1))
+                                {
+                                    foreach (var answer in question.Answers)
+                                    {
+                                        if (!string.IsNullOrEmpty(answer.Content))
+                                        {
+                                            return new CommonResult(CommonResultState.Warning, "Bledna walidacja odpowiedzi");
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                        else
+                            return new CommonResult(CommonResultState.Warning, "Pytanie nie zawiera odpowiedzi");
+                    }
+                    else
+                        return new CommonResult(CommonResultState.Warning, "Pytanie nie ma tresci");
+
+                }
+
+                return new CommonResult(CommonResultState.OK, "Walidacja pytan poprawna");
+
+            }
+            else
+                return new CommonResult(CommonResultState.Warning, "Ankieta nie zawiera pytan");
+        }
+        #endregion
 
         public async Task<CommonResult> AddSurvey(SurveyModel surveyModel)
         {
@@ -150,7 +204,7 @@ namespace SurveyIT.Services
                     {
                         foreach (var group in groups)
                         {
-                            if(groupsFromDB.FirstOrDefault(x=>x.Id.ToString()==group)!=null)
+                            if (groupsFromDB.FirstOrDefault(x => x.Id.ToString() == group) != null)
                                 newSurvey.SurveysList.Add(new Surveys_List { GroupId = int.Parse(group) });
                         }
                     }
@@ -207,7 +261,7 @@ namespace SurveyIT.Services
             }
         }
 
-
+        #region AssignRegion
         public async Task<CommonResult> AssignSurveysToGroup(List<string> surveyId, List<string> groupId)
         {
             try
@@ -228,7 +282,7 @@ namespace SurveyIT.Services
                                 {
                                     var surveyList = dbContext.Surveys_List.Where(x => x.Group.Id == groupDB.Id && x.Survey.Id == surveyDB.Id);
 
-                                    if(surveyList==null)
+                                    if (surveyList == null)
                                         dbContext.Surveys_List.Add(new Surveys_List { Group = groupDB, Survey = surveyDB });
                                 }
                                 else
@@ -253,80 +307,6 @@ namespace SurveyIT.Services
             catch (Exception ex)
             {
                 return new CommonResult(Enums.CommonResultState.Error, "Blad podczas przypisywania");
-            }
-        }
-
-        public SurveyModel GetOneSurvey(string surveyId)
-        {
-            try
-            {
-                if(!string.IsNullOrEmpty(surveyId))
-                {
-                    var survey = dbContext.Surveys.ToList().FirstOrDefault(s => s.Id.ToString() == surveyId);
-
-                    if(survey!=null)
-                    {
-                        SurveyModel surveyModel = new SurveyModel();
-                        surveyModel.End_date = survey.End_Date;
-                        surveyModel.Start_date = survey.Start_Date;
-                        surveyModel.Id = survey.Id;
-                        surveyModel.Name = survey.Name;
-                        surveyModel.Questions = new List<QuestionModel>();
-
-                        var questionLink = dbContext.Questions_List.ToList().Where(q => q.Survey.Id == survey.Id);
-
-                        if(questionLink!=null)
-                        {
-                            foreach (var qLink in questionLink)
-                            {
-                                var question = dbContext.Questions.ToList().Where(q => q.Id == qLink.Question.Id);
-                                if (question!=null)
-                                {
-                                    foreach (var oneQuestion in question)
-                                    {
-                                        QuestionModel questionModel = new QuestionModel();
-                                        questionModel.Content = oneQuestion.Content;
-                                        questionModel.QuestionType = oneQuestion.QuestionType;
-                                        questionModel.Id = oneQuestion.Id;
-                                        questionModel.Answers = new List<AnswerModel>();
-
-                                        var answerLink = dbContext.Answers_List.ToList().Where(a => a.Question.Id == oneQuestion.Id);
-
-                                        if(answerLink!=null)
-                                        {
-                                            foreach (var aLink in answerLink)
-                                            {
-                                                var answer = dbContext.Answers.ToList().Where(a => a.Id == aLink.Answer.Id);
-
-                                                foreach (var an in answer)
-                                                {
-                                                    AnswerModel answerModel = new AnswerModel();
-                                                    answerModel.Content = an.Content;
-                                                    answerModel.Id = an.Id;
-
-                                                    questionModel.Answers.Add(answerModel);
-                                                }
-                                            }
-                                        }
-
-                                        surveyModel.Questions.Add(questionModel);
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            return null;
-                        }
-                        return surveyModel;
-                    }
-                }
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Błąd wyswietlania");
             }
         }
 
@@ -376,6 +356,83 @@ namespace SurveyIT.Services
                 return new CommonResult(Enums.CommonResultState.Error, "Blad podczas przypisywania");
             }
         }
+        #endregion
+
+
+        public SurveyModel GetOneSurvey(string surveyId)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(surveyId))
+                {
+                    var survey = dbContext.Surveys.ToList().FirstOrDefault(s => s.Id.ToString() == surveyId);
+
+                    if (survey != null)
+                    {
+                        SurveyModel surveyModel = new SurveyModel();
+                        surveyModel.End_date = survey.End_Date;
+                        surveyModel.Start_date = survey.Start_Date;
+                        surveyModel.Id = survey.Id;
+                        surveyModel.Name = survey.Name;
+                        surveyModel.Questions = new List<QuestionModel>();
+
+                        var questionLink = dbContext.Questions_List.ToList().Where(q => q.Survey.Id == survey.Id);
+
+                        if (questionLink != null)
+                        {
+                            foreach (var qLink in questionLink)
+                            {
+                                var question = dbContext.Questions.ToList().Where(q => q.Id == qLink.Question.Id);
+                                if (question != null)
+                                {
+                                    foreach (var oneQuestion in question)
+                                    {
+                                        QuestionModel questionModel = new QuestionModel();
+                                        questionModel.Content = oneQuestion.Content;
+                                        questionModel.QuestionType = oneQuestion.QuestionType;
+                                        questionModel.Id = oneQuestion.Id;
+                                        questionModel.Answers = new List<AnswerModel>();
+
+                                        var answerLink = dbContext.Answers_List.ToList().Where(a => a.Question.Id == oneQuestion.Id);
+
+                                        if (answerLink != null)
+                                        {
+                                            foreach (var aLink in answerLink)
+                                            {
+                                                var answer = dbContext.Answers.ToList().Where(a => a.Id == aLink.Answer.Id);
+
+                                                foreach (var an in answer)
+                                                {
+                                                    AnswerModel answerModel = new AnswerModel();
+                                                    answerModel.Content = an.Content;
+                                                    answerModel.Id = an.Id;
+
+                                                    questionModel.Answers.Add(answerModel);
+                                                }
+                                            }
+                                        }
+
+                                        surveyModel.Questions.Add(questionModel);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                        return surveyModel;
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Błąd wyswietlania");
+            }
+        }
+
 
         public SortedList<string, string> GetAllSurveys()
         {
@@ -401,5 +458,34 @@ namespace SurveyIT.Services
                 throw new Exception("Błąd wyswietlania");
             }
         }
+
+        #region FillSurvey
+        public async Task<CommonResult> FillSurvey(string surveyId, List<string> questionsID, List<AnswerModel> answerModelsList)
+        {
+            try
+            {
+                var validationFillSurvey = ValidationFillSurvey(answerModelsList);
+
+                if(validationFillSurvey.StateMessage == CommonResultState.OK)
+                {
+
+                }
+
+                return validationFillSurvey;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public CommonResult ValidationFillSurvey(List<AnswerModel> answerModelsList)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        #endregion
     }
 }

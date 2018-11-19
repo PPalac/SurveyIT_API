@@ -20,6 +20,8 @@ namespace SurveyIT.Models.DBModels
 
         public List<Answers_List> AnswerList { get; set; }
 
+        public List<UserAnswers_List> UserAnswerList { get; set; }
+
         [Required]
         public QuestionType QuestionType { get; set; }
     }

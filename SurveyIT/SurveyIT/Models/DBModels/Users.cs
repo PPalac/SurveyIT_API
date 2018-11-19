@@ -21,5 +21,7 @@ namespace SurveyIT.Models.DBModels
         public Role Role { get; set; } 
 
         public List<GroupsLink> GroupsLink { get; set; }
+
+        public List<UsersLink> UserLink { get; set; }
     }
 }

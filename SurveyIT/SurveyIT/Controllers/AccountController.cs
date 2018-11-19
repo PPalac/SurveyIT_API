@@ -97,11 +97,6 @@ namespace SurveyIT.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-<<<<<<< HEAD
-
-=======
-            
->>>>>>> 6370e2175fb84bd981e7edb951e516604413b92b
             return Ok();
         }
     }
