@@ -20,5 +20,9 @@ namespace SurveyIT.Interfaces.Services
         SortedList<string, string> GetAllSurveys();
 
         SurveyModel GetOneSurvey(string surveyId);
+
+        Task<CommonResult> FillSurvey(string surveyId, List<string> questionsID, List<AnswerModel> answerModelsList);
+
+        CommonResult ValidationFillSurvey(List<AnswerModel> answerModelsList);
     }
 }
