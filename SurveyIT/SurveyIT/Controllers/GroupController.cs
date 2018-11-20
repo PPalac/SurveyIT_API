@@ -4,6 +4,7 @@ using SurveyIT.Attributes;
 using SurveyIT.Enums;
 using SurveyIT.Interfaces.Services;
 using SurveyIT.Models;
+using SurveyIT.Models.HelperModel;
 
 namespace SurveyIT.Controllers
 {
@@ -50,12 +51,12 @@ namespace SurveyIT.Controllers
 
         [Auth(Role.Admin)]
         [HttpPost("Edit")]
-        public async Task<IActionResult> EditGRoup([FromBody]GroupModel group, string newGroupName) //todo: dodac id do groupmodel
+        public async Task<IActionResult> EditGRoup([FromBody]HelperNewGroupModel helperNewGroup) //todo: dodac id do groupmodel
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var result = await groupService.EditGroup(group, newGroupName);
+            var result = await groupService.EditGroup(helperNewGroup.groupModel, helperNewGroup.newNameGroup);
 
             if (result.StateMessage == CommonResultState.OK)
                 return Ok(result.Message);
