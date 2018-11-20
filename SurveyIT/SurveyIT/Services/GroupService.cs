@@ -199,7 +199,8 @@ namespace SurveyIT.Services
 
                         foreach (var user in groupLink)
                         {
-                            userId.Add(user.User.Id);
+                            if(user.User.Role == Role.User)
+                                userId.Add(user.User.Id);
                         }
 
                         newGroupModel.UserId = userId;

@@ -129,6 +129,7 @@ namespace SurveyIT.Services
                     userModel.Id = user.Id;
                     userModel.LastName = user.LastName;
                     userModel.Username = user.UserName;
+                    userModel.Role = user.Role;
 
                     return userModel;
                 }
