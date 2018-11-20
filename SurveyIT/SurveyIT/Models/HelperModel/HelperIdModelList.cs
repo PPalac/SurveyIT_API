@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SurveyIT.Models.HelperModel
 {
-    public class HelperIdModel
+    public class HelperIdModelList
     {
         public List<string> FirstId { get; set; }
 

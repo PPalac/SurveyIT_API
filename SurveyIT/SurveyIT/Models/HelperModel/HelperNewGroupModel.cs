@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SurveyIT.Models.HelperModel
 {
-    public class NewGroupHelper
+    public class HelperNewGroupModel
     {
         public GroupModel groupModel { get; set; }
 
