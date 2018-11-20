@@ -1,6 +1,7 @@
 ﻿using SurveyIT.DB;
 using SurveyIT.Helpers;
 using SurveyIT.Interfaces.Services;
+using SurveyIT.Models.HelperModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace SurveyIT.Services
             this.dbContext = dbContext;
         }
 
-        public CommonResult AssignUsersToGroup(List<string> groupId, List<string> userId)
+        public async Task<CommonResult> AssignUsersToGroup(List<string> groupId, List<string> userId)
         {
             try
             {
@@ -31,7 +32,7 @@ namespace SurveyIT.Services
                         {
                             foreach (var users in userId)
                             {
-                                var user = dbContext.Users.FirstOrDefault(u => u.Id == users);
+                                var user = dbContext.Users.FirstOrDefault(u => u.Id == users && u.Role==Enums.Role.User);
 
                                 if(user!=null)
                                 {
@@ -47,7 +48,7 @@ namespace SurveyIT.Services
                                     return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie obiekty istnieja");
                                 }
                             }
-                            dbContext.SaveChanges();
+                            await dbContext.SaveChangesAsync();
                             return new CommonResult(Enums.CommonResultState.OK, "Przypisanie przebieglo pomyslnie");
                         }
                         else
@@ -65,18 +66,18 @@ namespace SurveyIT.Services
             }
         }
 
-        public SortedList<string, string> DisplayAllGroup()
+        public List<HelperIdModel> DisplayAllGroup()
         {
             try
             {
-                SortedList<string, string> groupList = new SortedList<string, string>();
+                List<HelperIdModel> groupList = new List<HelperIdModel>();
                 var groups = dbContext.Groups.ToList();
 
                 if (groups != null)
                 {
                     foreach (var group in groups)
                     {
-                        groupList.Add(group.Id.ToString(), group.Name);
+                        groupList.Add(new HelperIdModel { FirstId=group.Id.ToString(), SecondId = group.Name });
                     }
 
                     return groupList;
@@ -90,18 +91,18 @@ namespace SurveyIT.Services
             }
         }
 
-        public SortedList<string, string> DisplayAllUser()
+        public List<HelperIdModel> DisplayAllUser()
         {
             try
             {
-                SortedList<string, string> userList = new SortedList<string, string>();
-                var users = dbContext.Users.ToList();
+                List<HelperIdModel> userList = new List<HelperIdModel>();
+                var users = dbContext.Users.ToList().Where(x=>x.Role== Enums.Role.User);
 
                 if (users != null)
                 {
                     foreach (var user in users)
                     {
-                        userList.Add(user.Id.ToString(), user.UserName);
+                        userList.Add(new HelperIdModel { FirstId = user.Id.ToString(), SecondId = user.UserName });
                     }
 
                     return userList;
@@ -115,18 +116,19 @@ namespace SurveyIT.Services
             }
         }
 
-        public SortedList<string, string> DisplayAssignedUsers(string groupId)
+        public List<HelperIdModel> DisplayAssignedUsers(string groupId)
         {
             try
             {
-                SortedList<string, string> userList = new SortedList<string, string>();
+                List<HelperIdModel> userList = new List<HelperIdModel>();
                 var groupLinks = dbContext.GroupsLink.Where(g => g.Group.Id.ToString() == groupId);
 
                 if (groupLinks != null)
                 {
                     foreach (var groupLink in groupLinks)
                     {
-                        userList.Add(groupLink.User.Id,groupLink.User.UserName);
+                        if(groupLink.User.Role == Enums.Role.User)
+                            userList.Add(new HelperIdModel { FirstId = groupLink.User.Id, SecondId = groupLink.User.UserName });
                     }
 
                     return userList;
@@ -140,7 +142,7 @@ namespace SurveyIT.Services
             }
         }
 
-        public CommonResult UnAssignUsersInGroup(List<string> groupId, List<string> userId)
+        public async Task<CommonResult> UnAssignUsersInGroup(List<string> groupId, List<string> userId)
         {
             try
             {
@@ -154,7 +156,7 @@ namespace SurveyIT.Services
                         {
                             foreach (var users in userId)
                             {
-                                var user = dbContext.Users.FirstOrDefault(u => u.Id == users);
+                                var user = dbContext.Users.FirstOrDefault(u => u.Id == users && u.Role==Enums.Role.User);
 
                                 if (user != null)
                                 {
@@ -171,7 +173,7 @@ namespace SurveyIT.Services
                                 }
                             }
 
-                            dbContext.SaveChanges();
+                            await dbContext.SaveChangesAsync();
                             return new CommonResult(Enums.CommonResultState.OK, "Odprzypisanie przebieglo pomyslnie");
                         }
                         else

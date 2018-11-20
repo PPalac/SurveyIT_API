@@ -1,4 +1,5 @@
 ﻿using SurveyIT.Helpers;
+using SurveyIT.Models.HelperModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,14 +9,14 @@ namespace SurveyIT.Interfaces.Services
 {
     public interface IUserManagementService
     {
-        SortedList<string,string> DisplayAllUser();
+        List<HelperIdModel> DisplayAllUser();
 
-        SortedList<string, string> DisplayAllGroup();
+        List<HelperIdModel> DisplayAllGroup();
 
-        SortedList<string, string> DisplayAssignedUsers(string groupId);
+        List<HelperIdModel> DisplayAssignedUsers(string groupId);
 
-        CommonResult AssignUsersToGroup(List<string> groupId, List<string> userId);
+        Task<CommonResult> AssignUsersToGroup(List<string> groupId, List<string> userId);
 
-        CommonResult UnAssignUsersInGroup(List<string> groupId, List<string> userId);
+        Task<CommonResult> UnAssignUsersInGroup(List<string> groupId, List<string> userId);
     }
 }
