@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using SurveyIT.Enums;
 using SurveyIT.Interfaces.Services;
 using SurveyIT.Models;
+using SurveyIT.Models.HelperModel;
 
 namespace SurveyIT.Controllers
 {
@@ -48,7 +49,7 @@ namespace SurveyIT.Controllers
         }
 
         //[Auth(Role.Admin)]
-        [HttpPost("DisplayOne")]
+        [HttpPost("DisplayAll/DisplayOne")]
         public JsonResult DisplayOneSurvey([FromBody]string surveyId)
         {
             if (!ModelState.IsValid)
@@ -61,5 +62,36 @@ namespace SurveyIT.Controllers
 
             return Json("Błąd wyświetlania");
         }
+
+        //[Auth(Role.Admin)]
+        [HttpPost("AssignSurvey")]
+        public async Task<IActionResult> AssignSurveysToGroup([FromBody]HelperIdModel surveyIDGroupID)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var result = await surveyService.AssignSurveysToGroup(surveyIDGroupID.FirstId,surveyIDGroupID.SecondId);
+
+            if (result.StateMessage == CommonResultState.OK)
+                return Ok(result.Message);
+
+            return BadRequest(result.Message);
+        }
+
+        //[Auth(Role.Admin)]
+        [HttpPost("UnAssignSurvey")]
+        public async Task<IActionResult> UnAssignSurveysToGroup([FromBody]HelperIdModel surveyIDGroupID)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var result = await surveyService.UnAssignSurveysInGroup(surveyIDGroupID.FirstId, surveyIDGroupID.SecondId);
+
+            if (result.StateMessage == CommonResultState.OK)
+                return Ok(result.Message);
+
+            return BadRequest(result.Message);
+        }
+
     }
 }
