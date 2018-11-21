@@ -16,6 +16,8 @@ namespace SurveyIT.Models
 
         public List<AnswerModel> Answers { get; set; }
 
+        public List<UserAnswerModel> UserAnswers { get; set; }
+
         public QuestionType QuestionType { get; set; }
     }
 }
