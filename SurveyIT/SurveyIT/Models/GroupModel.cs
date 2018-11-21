@@ -12,5 +12,10 @@ namespace SurveyIT.Models
         public string Name { get; set; }
 
         public List<string> UserId { get; set; }
+
+        public GroupModel()
+        {
+            UserId = new List<string>();
+        }
     }
 }

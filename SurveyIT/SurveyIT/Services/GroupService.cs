@@ -110,7 +110,7 @@ namespace SurveyIT.Services
 
                 return new CommonResult(CommonResultState.Error, "Grupa nie istnieje");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return new CommonResult(CommonResultState.Error, "Błąd podczas usuwania grupy");
             }
@@ -139,7 +139,7 @@ namespace SurveyIT.Services
 
                 return result;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return new CommonResult(CommonResultState.Error, "Błąd podczas zmiany nazwy grupy");
             }
@@ -150,7 +150,7 @@ namespace SurveyIT.Services
             try
             {
                 List<GroupModel> groupList = new List<GroupModel>();
-                var groups = dbContext.Groups.ToList();
+                var groups = dbContext.Groups.Include(g => g.GroupsLink).ToList();
 
                 if(groups!=null)
                 {
@@ -159,9 +159,8 @@ namespace SurveyIT.Services
                         GroupModel newGroupModel = new GroupModel();
                         newGroupModel.Name = group.Name;
                         newGroupModel.Id = group.Id;
-                        var newGroupLink = dbContext.GroupsLink.Where(x => x.Group.Id == newGroupModel.Id);
 
-                        foreach (var groupLink in newGroupLink)
+                        foreach (var groupLink in group.GroupsLink)
                         {
                             newGroupModel.UserId.Add(groupLink.UserId);
                         }
@@ -173,7 +172,7 @@ namespace SurveyIT.Services
 
                 return null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw new Exception("Błąd wyswietlania");
             }
@@ -211,7 +210,7 @@ namespace SurveyIT.Services
 
                 return null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 throw new Exception("Błąd");
             }
