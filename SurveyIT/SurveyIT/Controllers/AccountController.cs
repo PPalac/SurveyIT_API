@@ -116,5 +116,23 @@ namespace SurveyIT.Controllers
             return Json("Błąd wyświetlania");
 
         }
+
+        [HttpGet("CurrentUser")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var username = HttpContext.User.Identities.First().Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+
+            if (string.IsNullOrEmpty(username))
+            {
+                var result = await accountService.GetUserByUsername(username);
+
+                if (result != null)
+                {
+                    return Ok(Json(result));
+                }
+            }
+
+            return BadRequest("Nie znaleziono użytkownika");
+        }
     }
 }

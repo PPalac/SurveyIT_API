@@ -16,5 +16,7 @@ namespace SurveyIT.Interfaces.Services
         List<UserModel> GetAllUsersWithRoleUser();
 
         UserModel GetOneUserById(string userId);
+
+        Task<UserModel> GetUserByUsername(string username);
     }
 }

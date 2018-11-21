@@ -70,7 +70,7 @@ namespace SurveyIT.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var result = await surveyService.AssignSurveysToGroup(surveyIDGroupID.FirstId,surveyIDGroupID.SecondId);
+            var result = await surveyService.AssignSurveysToGroup(surveyIDGroupID.FirstId, surveyIDGroupID.SecondId);
 
             if (result.StateMessage == CommonResultState.OK)
                 return Ok(result.Message);

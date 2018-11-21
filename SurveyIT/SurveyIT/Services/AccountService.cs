@@ -141,5 +141,24 @@ namespace SurveyIT.Services
                 throw new Exception("Błąd wyswietlania");
             }
         }
+
+        public async Task<UserModel> GetUserByUsername(string username)
+        {
+            var user = await userManager.FindByNameAsync(username);
+
+            if (user != null)
+            {
+                return new UserModel
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Username = user.UserName
+                };
+            }
+
+            return null;
+        }
     }
 }
