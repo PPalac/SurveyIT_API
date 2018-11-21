@@ -65,7 +65,7 @@ namespace SurveyIT.Controllers
 
         //[Auth(Role.Admin)]
         [HttpPost("AssignSurvey")]
-        public async Task<IActionResult> AssignSurveysToGroup([FromBody]HelperIdModel surveyIDGroupID)
+        public async Task<IActionResult> AssignSurveysToGroup([FromBody]HelperIdModelList surveyIDGroupID)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -80,7 +80,7 @@ namespace SurveyIT.Controllers
 
         //[Auth(Role.Admin)]
         [HttpPost("UnAssignSurvey")]
-        public async Task<IActionResult> UnAssignSurveysToGroup([FromBody]HelperIdModel surveyIDGroupID)
+        public async Task<IActionResult> UnAssignSurveysToGroup([FromBody]HelperIdModelList surveyIDGroupID)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -92,6 +92,8 @@ namespace SurveyIT.Controllers
 
             return BadRequest(result.Message);
         }
+
+
 
     }
 }

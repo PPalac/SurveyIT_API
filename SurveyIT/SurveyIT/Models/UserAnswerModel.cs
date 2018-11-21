@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace SurveyIT.Models
 {
-    public class AnswerModel
+    public class UserAnswerModel
     {
         public int Id { get; set; }
 
         public string Content { get; set; }
 
-        public string quesionId { get; set; }
+        public string questionId { get; set; }
     }
 }
