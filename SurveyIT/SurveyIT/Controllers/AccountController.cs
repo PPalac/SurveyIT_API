@@ -122,7 +122,7 @@ namespace SurveyIT.Controllers
         {
             var username = HttpContext.User.Identities.First().Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
 
-            if (string.IsNullOrEmpty(username))
+            if (!string.IsNullOrEmpty(username))
             {
                 var result = await accountService.GetUserByUsername(username);
 

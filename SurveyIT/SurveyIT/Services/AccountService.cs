@@ -31,11 +31,11 @@ namespace SurveyIT.Services
             {
                 if ((Regex.IsMatch(user.FirstName.First().ToString(), "[A-Z]")) && (Regex.IsMatch(user.LastName.First().ToString(), "[A-Z]")))
                 {
-                    if (user.Password.Length > 6)
+                    if (string.IsNullOrEmpty(user.Password) || user.Password.Length > 6)
                     {
-                        if (!dbContext.Users.Any(u => u.UserName == user.Username))
+                        if (!dbContext.Users.Any(u => u.UserName == user.Username && u.Id != user.Id))
                         {
-                            if (!dbContext.Users.Any(u => u.Email == user.Email))
+                            if (!dbContext.Users.Any(u => u.Email == user.Email && u.UserName != user.Username))
                             {
                                 return new CommonResult(CommonResultState.OK, "Wszystkie dane są poprawne");
                             }
@@ -70,7 +70,9 @@ namespace SurveyIT.Services
                     newUser.LastName = user.LastName;
                     newUser.Email = user.Email;
                     newUser.UserName = user.Username;
-                    await userManager.AddPasswordAsync(newUser, user.Password);
+
+                    if (!string.IsNullOrEmpty(user.Password))
+                        await userManager.AddPasswordAsync(newUser, user.Password);
 
                     dbContext.Users.Update(newUser);
 

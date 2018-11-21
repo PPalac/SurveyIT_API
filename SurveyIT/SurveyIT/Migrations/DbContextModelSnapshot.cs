@@ -136,8 +136,6 @@ namespace SurveyIT.Migrations
 
                     b.Property<string>("Content");
 
-                    b.Property<int>("Type");
-
                     b.HasKey("Id");
 
                     b.ToTable("Answers");
@@ -150,7 +148,7 @@ namespace SurveyIT.Migrations
 
                     b.Property<int?>("AnswerId");
 
-                    b.Property<int?>("QuestionId");
+                    b.Property<int>("QuestionId");
 
                     b.HasKey("Id");
 
@@ -200,6 +198,8 @@ namespace SurveyIT.Migrations
                     b.Property<string>("Content")
                         .IsRequired();
 
+                    b.Property<int>("QuestionType");
+
                     b.HasKey("Id");
 
                     b.ToTable("Questions");
@@ -212,7 +212,7 @@ namespace SurveyIT.Migrations
 
                     b.Property<int?>("QuestionId");
 
-                    b.Property<int?>("SurveyId");
+                    b.Property<int>("SurveyId");
 
                     b.HasKey("Id");
 
@@ -230,6 +230,9 @@ namespace SurveyIT.Migrations
 
                     b.Property<DateTime>("End_Date");
 
+                    b.Property<string>("Name")
+                        .IsRequired();
+
                     b.Property<DateTime>("Start_Date");
 
                     b.HasKey("Id");
@@ -242,7 +245,7 @@ namespace SurveyIT.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("GroupId");
+                    b.Property<int>("GroupId");
 
                     b.Property<int?>("SurveyId");
 
@@ -253,6 +256,37 @@ namespace SurveyIT.Migrations
                     b.HasIndex("SurveyId");
 
                     b.ToTable("Surveys_List");
+                });
+
+            modelBuilder.Entity("SurveyIT.Models.DBModels.UserAnswers", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Content")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserAnswers");
+                });
+
+            modelBuilder.Entity("SurveyIT.Models.DBModels.UserAnswers_List", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("QuestionId");
+
+                    b.Property<int?>("UserAnswerId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("UserAnswerId");
+
+                    b.ToTable("UserAnswers_Lists");
                 });
 
             modelBuilder.Entity("SurveyIT.Models.DBModels.Users", b =>
@@ -316,6 +350,24 @@ namespace SurveyIT.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("SurveyIT.Models.DBModels.UsersLink", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("UserAnswerId");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserAnswerId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UsersLink");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
@@ -369,7 +421,8 @@ namespace SurveyIT.Migrations
 
                     b.HasOne("SurveyIT.Models.DBModels.Questions", "Question")
                         .WithMany("AnswerList")
-                        .HasForeignKey("QuestionId");
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("SurveyIT.Models.DBModels.GroupsLink", b =>
@@ -391,18 +444,43 @@ namespace SurveyIT.Migrations
 
                     b.HasOne("SurveyIT.Models.DBModels.Surveys", "Survey")
                         .WithMany("QuestionsList")
-                        .HasForeignKey("SurveyId");
+                        .HasForeignKey("SurveyId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("SurveyIT.Models.DBModels.Surveys_List", b =>
                 {
                     b.HasOne("SurveyIT.Models.DBModels.Groups", "Group")
                         .WithMany("SurveysList")
-                        .HasForeignKey("GroupId");
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("SurveyIT.Models.DBModels.Surveys", "Survey")
                         .WithMany("SurveysList")
                         .HasForeignKey("SurveyId");
+                });
+
+            modelBuilder.Entity("SurveyIT.Models.DBModels.UserAnswers_List", b =>
+                {
+                    b.HasOne("SurveyIT.Models.DBModels.Questions", "Question")
+                        .WithMany("UserAnswerList")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("SurveyIT.Models.DBModels.UserAnswers", "UserAnswer")
+                        .WithMany("UserAnswerList")
+                        .HasForeignKey("UserAnswerId");
+                });
+
+            modelBuilder.Entity("SurveyIT.Models.DBModels.UsersLink", b =>
+                {
+                    b.HasOne("SurveyIT.Models.DBModels.UserAnswers", "UserAnswer")
+                        .WithMany("UserLinkL")
+                        .HasForeignKey("UserAnswerId");
+
+                    b.HasOne("SurveyIT.Models.DBModels.Users", "User")
+                        .WithMany("UserLink")
+                        .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
         }
