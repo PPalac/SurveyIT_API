@@ -116,7 +116,7 @@ namespace SurveyIT.Services
                                 return new CommonResult(CommonResultState.Warning, "Odpowiedz powinna byc pusta");
                             }
                         }
-                        else 
+                        else
                             return new CommonResult(CommonResultState.Warning, "Pytanie nie zawiera odpowiedzi");
                     }
                     else
@@ -434,18 +434,18 @@ namespace SurveyIT.Services
         }
 
 
-        public SortedList<string, string> GetAllSurveys()
+        public List<Tuple<string, string>> GetAllSurveys()
         {
             try
             {
-                SortedList<string, string> surveyList = new SortedList<string, string>();
+                List<Tuple<string, string>> surveyList = new List<Tuple<string, string>>();
                 var surveys = dbContext.Surveys.ToList();
 
                 if (surveys != null)
                 {
                     foreach (var survey in surveys)
                     {
-                        surveyList.Add(survey.Id.ToString(), survey.Name);
+                        surveyList.Add(new Tuple<string, string>(survey.Id.ToString(), survey.Name));
                     }
 
                     return surveyList;
