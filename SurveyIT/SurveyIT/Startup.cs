@@ -86,6 +86,7 @@ namespace SurveyIT
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<ISurveyService, SurveyService>();
             services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IReportService, ReportService>();
 
             services.AddDbContext<SurveyIT.DB.MyDbContext>(options =>
             options.UseSqlServer(Configuration["ConnectionString"],
