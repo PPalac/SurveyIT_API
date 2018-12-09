@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SurveyIT.Attributes;
 using SurveyIT.Enums;
 using SurveyIT.Interfaces.Services;
 using SurveyIT.Models;
@@ -22,7 +24,7 @@ namespace SurveyIT.Controllers
             this.surveyService = surveyService;
         }
 
-        //[Auth(Role.Admin)]
+        [Auth(Role.Admin)]
         [HttpPost("Create")]
         public async Task<IActionResult> CreateSurvey([FromBody]SurveyModel survey)
         {
@@ -37,10 +39,14 @@ namespace SurveyIT.Controllers
             return BadRequest(result.Message);
         }
 
-        //[Auth(Role.Admin)]
+        [Auth(Role.Admin)]
         [HttpGet("DisplayAll")]
-        public JsonResult DisplayAll()
+        public IActionResult DisplayAll()
         {
+
+            if (HttpContext.User.FindFirstValue(ClaimTypes.Role) == Role.User.ToString())
+                return RedirectToAction("DisplayNotFillSurveysAfterDate", "Account");
+
             var result = surveyService.GetAllSurveys();
 
             if (result != null)
@@ -49,9 +55,9 @@ namespace SurveyIT.Controllers
             return Json("Błąd wyświetlania");
         }
 
-        //[Auth(Role.Admin)]
+        [Authorize]
         [HttpPost("DisplayAll/DisplayOne")]
-        public JsonResult DisplayOneSurvey([FromBody]string surveyId)
+        public JsonResult DisplayOneSurvey([FromQuery] string surveyId)
         {
             if (!ModelState.IsValid)
                 return Json("Błąd wyświetlania");
@@ -64,14 +70,14 @@ namespace SurveyIT.Controllers
             return Json("Błąd wyświetlania");
         }
 
-        //[Auth(Role.Admin)]
+        [Auth(Role.Admin)]
         [HttpPost("AssignSurvey")]
         public async Task<IActionResult> AssignSurveysToGroup([FromBody]HelperIdModelList surveyIDGroupID)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var result = await surveyService.AssignSurveysToGroup(surveyIDGroupID.FirstId, surveyIDGroupID.SecondId);
+            var result = await surveyService.AssignSurveysToGroup(surveyIDGroupID.UsersId, surveyIDGroupID.GroupsId);
 
             if (result.StateMessage == CommonResultState.OK)
                 return Ok(result.Message);
@@ -79,14 +85,14 @@ namespace SurveyIT.Controllers
             return BadRequest(result.Message);
         }
 
-        //[Auth(Role.Admin)]
+        [Auth(Role.Admin)]
         [HttpPost("UnAssignSurvey")]
         public async Task<IActionResult> UnAssignSurveysToGroup([FromBody]HelperIdModelList surveyIDGroupID)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var result = await surveyService.UnAssignSurveysInGroup(surveyIDGroupID.FirstId, surveyIDGroupID.SecondId);
+            var result = await surveyService.UnAssignSurveysInGroup(surveyIDGroupID.UsersId, surveyIDGroupID.GroupsId);
 
             if (result.StateMessage == CommonResultState.OK)
                 return Ok(result.Message);
@@ -94,16 +100,16 @@ namespace SurveyIT.Controllers
             return BadRequest(result.Message);
         }
 
-        //[Auth(Role.Admin)]
+        [Auth(Role.Admin)]
         [HttpPost("FillSurvey")]
-        public async Task<IActionResult> fillSurvey([FromBody]HelperFillSurveyModel fillSurveyModel)
+        public async Task<IActionResult> FillSurvey([FromBody]HelperFillSurveyModel fillSurveyModel)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
-            
-            var user = HttpContext.User.Identities.First().Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
 
-            var result = await surveyService.FillSurvey(fillSurveyModel.surveyId, fillSurveyModel.UserAnswerModel, fillSurveyModel.userId);
+            var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var result = await surveyService.FillSurvey(fillSurveyModel.surveyId, fillSurveyModel.UserAnswerModel, userId);
 
             if (result.StateMessage == CommonResultState.OK)
                 return Ok(result.Message);

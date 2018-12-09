@@ -75,21 +75,9 @@ namespace SurveyIT.Services
 
         public ClaimsPrincipal Login(Users user)
         {
-            //var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
-            //var credentials = new SigningCredentials(
-            //    key, 
-            //    SecurityAlgorithms.HmacSha256);
-
-            //var token = new JwtSecurityToken(
-            //    config["Jwt:Issuer"], 
-            //    config["Jwt:Issuer"], 
-            //    expires: DateTime.Now.AddMinutes(30), 
-            //    signingCredentials: credentials);
-
-            //return new JwtSecurityTokenHandler().WriteToken(token);
-
             List<Claim> claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role.ToString())

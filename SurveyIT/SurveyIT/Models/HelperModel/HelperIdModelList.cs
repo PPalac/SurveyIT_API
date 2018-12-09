@@ -7,8 +7,8 @@ namespace SurveyIT.Models.HelperModel
 {
     public class HelperIdModelList
     {
-        public List<string> FirstId { get; set; }
+        public List<string> UsersId { get; set; }
 
-        public List<string> SecondId { get; set; }
+        public List<string> GroupsId { get; set; }
     }
 }

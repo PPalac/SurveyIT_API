@@ -2,6 +2,7 @@
 using SurveyIT.DB;
 using SurveyIT.Helpers;
 using SurveyIT.Interfaces.Services;
+using SurveyIT.Models;
 using SurveyIT.Models.HelperModel;
 using System;
 using System.Collections.Generic;
@@ -165,6 +166,17 @@ namespace SurveyIT.Services
             {
                 throw new Exception(Properties.Resources.ErrorDisplay);
             }
+        }
+
+        public List<UserModel> GetUnusignedUsers(string groupId)
+        {
+            if (int.TryParse(groupId, out int gId))
+                return dbContext.Users
+                    .Where(u => u.Role == Enums.Role.User && !u.GroupsLink.Any(gl => gl.Group.Id == gId))
+                    .Select(u => new UserModel { Id = u.Id, Username = u.UserName })
+                    .ToList();
+
+            return new List<UserModel>();
         }
 
         public async Task<CommonResult> UnAssignUsersInGroup(List<string> groupId, List<string> userId)

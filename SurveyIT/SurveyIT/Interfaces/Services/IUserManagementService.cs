@@ -1,4 +1,5 @@
 ﻿using SurveyIT.Helpers;
+using SurveyIT.Models;
 using SurveyIT.Models.HelperModel;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,8 @@ namespace SurveyIT.Interfaces.Services
         List<HelperIdGroupModel> DisplayAllGroup();
 
         List<HelperIdGroupModel> DisplayAssignedUsers(string groupId);
+
+        List<UserModel> GetUnusignedUsers(string groupId);
 
         Task<CommonResult> AssignUsersToGroup(List<string> userId, List<string> groupId);
 
