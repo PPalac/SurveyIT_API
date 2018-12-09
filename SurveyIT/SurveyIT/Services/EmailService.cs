@@ -133,43 +133,82 @@ namespace SurveyIT.Services
             {
                 List<string> emailsList = new List<string>();
 
-                foreach (var user in userId)
+                foreach (var groups in groupId)
                 {
-                    var userInDb = dbContext.Users.FirstOrDefault(u => u.Id == user);
+                    var group = dbContext.Groups.FirstOrDefault(x => x.Id.ToString() == groups);
 
-                    foreach (var group in groupId)
+                    if (group != null)
                     {
-                        var validSurveys = dbContext
-                            .Surveys
-                            .Include(s => s.SurveysList)
-                            .Where(s => s.SurveysList.Any(sl => sl.GroupId.ToString() == group) && s.End_Date > DateTime.Now).Select(s => s.Id.ToString()).ToList();
 
-                        var AllGroups = dbContext
-                            .Groups
-                            .Include(g => g.GroupsLink)
-                            .Include(g => g.SurveysList)
-                            .Where(g => g.GroupsLink.Any(gl => gl.UserId == user)).Select(g => g.Id.ToString());
-
-                        var surveyId = dbContext
-                            .Surveys
-                            .Include(s => s.SurveysList)
-                                .ThenInclude(sl => sl.Group)
-                            .Where(s => s.SurveysList.Any(sl => AllGroups.Contains(sl.Group.Id.ToString())) && s.End_Date > DateTime.Now).Select(s => s.Id.ToString()).ToList();
-
-
-                        validSurveys = validSurveys.Except(surveyId).ToList();
-
-                        if (validSurveys.Count > 0)
+                        foreach (var users in userId)
                         {
-                            emailsList.Add(userInDb.Email);
-                            break;
+                            var user = dbContext.Users.FirstOrDefault(u => u.Id == users && u.Role == Enums.Role.User);
+
+                            if (user != null)
+                            {
+                                var groupLink = dbContext.GroupsLink.Where(x => x.User.Id == user.Id && x.Group.Id == group.Id).ToList();
+
+                                if (groupLink.Count == 0)
+                                {
+                                    emailsList.Add(user.Email);
+                                    break;
+                                }
+                                //else
+                                //    return new CommonResult(Enums.CommonResultState.Warning, "Takie przypisanie juz istnieje");
+                            }
+                            else
+                            {
+                                return null;
+                            }
                         }
-                            
+
+
+                    }
+                    else
+                    {
+                        return null;
                     }
                 }
-                
 
                 return emailsList;
+
+                //foreach (var user in userId)
+                //{
+                //    var userInDb = dbContext.Users.FirstOrDefault(u => u.Id == user);
+
+                //    foreach (var group in groupId)
+                //    {
+                //        var validSurveys = dbContext
+                //            .Surveys
+                //            .Include(s => s.SurveysList)
+                //            .Where(s => s.SurveysList.Any(sl => sl.GroupId.ToString() == group) && s.End_Date > DateTime.Now).Select(s => s.Id.ToString()).ToList();
+
+                //        var AllGroups = dbContext
+                //            .Groups
+                //            .Include(g => g.GroupsLink)
+                //            .Include(g => g.SurveysList)
+                //            .Where(g => g.GroupsLink.Any(gl => gl.UserId == user)).Select(g => g.Id.ToString());
+
+                //        var surveyId = dbContext
+                //            .Surveys
+                //            .Include(s => s.SurveysList)
+                //                .ThenInclude(sl => sl.Group)
+                //            .Where(s => s.SurveysList.Any(sl => AllGroups.Contains(sl.Group.Id.ToString())) && s.End_Date > DateTime.Now).Select(s => s.Id.ToString()).ToList();
+
+
+                //        validSurveys = validSurveys.Except(surveyId).ToList();
+
+                //        if (validSurveys.Count > 0)
+                //        {
+                //            emailsList.Add(userInDb.Email);
+                //            break;
+                //        }
+
+                //    }
+                //}
+
+
+                //return emailsList;
             }
             catch (Exception ex)
             {
