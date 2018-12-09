@@ -32,19 +32,19 @@ namespace SurveyIT.Services
                     {
                         if (!dbContext.Groups.Any(g => g.Name == group.Name))
                         {
-                            return new CommonResult(CommonResultState.OK, "Walidacja poprawna");
+                            return new CommonResult(CommonResultState.OK, Properties.Resources.CorrectValidation);
                         }
 
-                        return new CommonResult(CommonResultState.Warning, "Grupa o takiej nazwie istnieje");
+                        return new CommonResult(CommonResultState.Warning, Properties.Resources.GroupNameUsed);
                     }
 
-                    return new CommonResult(CommonResultState.Warning, "Za krótka nazwa");
+                    return new CommonResult(CommonResultState.Warning, Properties.Resources.ShortGroupName);
                 }
 
-                return new CommonResult(CommonResultState.Warning, "Nazwa powinna zaczynać się od wielkiej litery");
+                return new CommonResult(CommonResultState.Warning, Properties.Resources.NotValidName);
             }
 
-            return new CommonResult(CommonResultState.Error, "Błąd walidacji");
+            return new CommonResult(CommonResultState.Error, Properties.Resources.ErrorValidation);
         }
 
         public async Task<CommonResult> AddGroup(GroupModel group)
@@ -71,7 +71,7 @@ namespace SurveyIT.Services
 
                     dbContext.Groups.Add(newGroup);
                     await dbContext.SaveChangesAsync();
-                    validationResult.Message = "Pomyslnie dodano grupe";
+                    validationResult.Message = Properties.Resources.GroupAdded;
                     return validationResult;
                 }
 
@@ -79,7 +79,7 @@ namespace SurveyIT.Services
             }
             catch (Exception ex)
             {
-                return new CommonResult(CommonResultState.Error, "Błąd");
+                return new CommonResult(CommonResultState.Error, Properties.Resources.Error);
             }
 
         }
@@ -105,14 +105,14 @@ namespace SurveyIT.Services
 
                     await dbContext.SaveChangesAsync();
 
-                    return new CommonResult(CommonResultState.OK, "Usunieto grupe");
+                    return new CommonResult(CommonResultState.OK, Properties.Resources.GroupDeleted);
                 }
 
-                return new CommonResult(CommonResultState.Error, "Grupa nie istnieje");
+                return new CommonResult(CommonResultState.Error, Properties.Resources.GroupNotExist);
             }
             catch (Exception ex)
             {
-                return new CommonResult(CommonResultState.Error, "Błąd podczas usuwania grupy");
+                return new CommonResult(CommonResultState.Error, Properties.Resources.Error);
             }
 
         }
@@ -134,14 +134,14 @@ namespace SurveyIT.Services
 
                     await dbContext.SaveChangesAsync();
 
-                    return new CommonResult(CommonResultState.OK, "Zmiana nazwy powiodła sie");
+                    return new CommonResult(CommonResultState.OK, Properties.Resources.ChangedName);
                 }
 
                 return result;
             }
             catch (Exception ex)
             {
-                return new CommonResult(CommonResultState.Error, "Błąd podczas zmiany nazwy grupy");
+                return new CommonResult(CommonResultState.Error, Properties.Resources.Error);
             }
         }
 
@@ -174,7 +174,7 @@ namespace SurveyIT.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Błąd wyswietlania");
+                throw new Exception(Properties.Resources.ErrorDisplay);
             }
         }
 
@@ -198,8 +198,7 @@ namespace SurveyIT.Services
 
                         foreach (var user in groupLink)
                         {
-                            if(user.User.Role == Role.User)
-                                userId.Add(user.User.Id);
+                            userId.Add(user.UserId);
                         }
 
                         newGroupModel.UserId = userId;
@@ -212,7 +211,7 @@ namespace SurveyIT.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Błąd");
+                throw new Exception(Properties.Resources.Error);
             }
         }
     }

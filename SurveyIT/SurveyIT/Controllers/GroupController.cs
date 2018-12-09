@@ -19,7 +19,7 @@ namespace SurveyIT.Controllers
             this.groupService = groupService;
         }
 
-        [Auth(Role.Admin)]
+        //[Auth(Role.Admin)]
         [HttpPost("Create")]
         public async Task<IActionResult> CreateGroup([FromBody]GroupModel group)
         {
@@ -34,7 +34,7 @@ namespace SurveyIT.Controllers
             return BadRequest(result.Message);
         }
 
-        [Auth(Role.Admin)]
+        //[Auth(Role.Admin)]
         [HttpPost("Delete")]
         public async Task<IActionResult> DeleteGroup([FromBody]GroupModel group)
         {
@@ -49,7 +49,7 @@ namespace SurveyIT.Controllers
             return BadRequest(result.Message);
         }
 
-        [Auth(Role.Admin)]
+        //[Auth(Role.Admin)]
         [HttpPost("Edit")]
         public async Task<IActionResult> EditGRoup([FromBody]HelperNewGroupModel helperNewGroup) //todo: dodac id do groupmodel
         {
@@ -64,7 +64,7 @@ namespace SurveyIT.Controllers
             return BadRequest(result.Message);
         }
 
-        [Auth(Role.Admin)]
+        //[Auth(Role.Admin)]
         [HttpGet("Display")]
         public JsonResult DisplayAll()
         {
@@ -76,7 +76,7 @@ namespace SurveyIT.Controllers
             return Json("Błąd wyświetlania");
         }
 
-        [Auth(Roles = "Admin")]
+        //[Auth(Roles = "Admin")]
         [HttpPost("Display/OneGroup")]
         public JsonResult DisplayOneGroup([FromBody]string groupId)
         {
