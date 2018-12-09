@@ -9,6 +9,9 @@ using SurveyIT.Models.HelperModel;
 
 namespace SurveyIT.Controllers
 {
+
+    [Produces("application/json")]
+    [Route("api/UserManagement")]
     public class UserManagementController : Controller
     {
         private IUserManagementService userManagementService;
@@ -46,6 +49,9 @@ namespace SurveyIT.Controllers
         [HttpPost("DisplayAllGroups/AssignUsers")]
         public JsonResult DisplayAssignUsers([FromBody] string groupId)
         {
+            if (!ModelState.IsValid)
+                return Json("Error");
+
             var result = userManagementService.DisplayAssignedUsers(groupId);
 
             if (result != null)
@@ -55,13 +61,13 @@ namespace SurveyIT.Controllers
         }
 
         //[Auth(Role.Admin)]
-        [HttpPost("AssignToGRoup")]
-        public async Task<IActionResult> AssignUsersToGroups([FromBody]HelperIdModelList surveyIDGroupID)
+        [HttpPost("AssignToGroup")]
+        public async Task<IActionResult> AssignUsersToGroups([FromBody]HelperIdModelList userIdGroupId)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var result = await userManagementService.AssignUsersToGroup(surveyIDGroupID.FirstId, surveyIDGroupID.SecondId);
+            var result = await userManagementService.AssignUsersToGroup(userIdGroupId.FirstId, userIdGroupId.SecondId);
 
             if (result.StateMessage == CommonResultState.OK)
                 return Ok(result.Message);

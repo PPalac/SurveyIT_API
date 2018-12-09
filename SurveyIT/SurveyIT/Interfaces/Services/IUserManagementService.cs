@@ -9,13 +9,13 @@ namespace SurveyIT.Interfaces.Services
 {
     public interface IUserManagementService
     {
-        List<HelperIdModel> DisplayAllUser();
+        List<HelperIdUserModel> DisplayAllUser();
 
-        List<HelperIdModel> DisplayAllGroup();
+        List<HelperIdGroupModel> DisplayAllGroup();
 
-        List<HelperIdModel> DisplayAssignedUsers(string groupId);
+        List<HelperIdGroupModel> DisplayAssignedUsers(string groupId);
 
-        Task<CommonResult> AssignUsersToGroup(List<string> groupId, List<string> userId);
+        Task<CommonResult> AssignUsersToGroup(List<string> userId, List<string> groupId);
 
         Task<CommonResult> UnAssignUsersInGroup(List<string> groupId, List<string> userId);
     }

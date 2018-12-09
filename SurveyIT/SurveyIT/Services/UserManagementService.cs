@@ -1,4 +1,5 @@
-﻿using SurveyIT.DB;
+﻿using Microsoft.EntityFrameworkCore;
+using SurveyIT.DB;
 using SurveyIT.Helpers;
 using SurveyIT.Interfaces.Services;
 using SurveyIT.Models.HelperModel;
@@ -12,72 +13,83 @@ namespace SurveyIT.Services
     public class UserManagementService : IUserManagementService
     {
         private MyDbContext dbContext;
+        private EmailService emailService;
 
         public UserManagementService(MyDbContext dbContext)
         {
             this.dbContext = dbContext;
+            emailService = new EmailService(dbContext);
         }
 
-        public async Task<CommonResult> AssignUsersToGroup(List<string> groupId, List<string> userId)
+        public async Task<CommonResult> AssignUsersToGroup(List<string> userId, List<string> groupId)
         {
             try
             {
-                if(groupId!=null && userId!=null)
+                if (groupId != null && userId != null)
                 {
                     foreach (var groups in groupId)
                     {
                         var group = dbContext.Groups.FirstOrDefault(x => x.Id.ToString() == groups);
 
-                        if(group!=null)
+                        if (group != null)
                         {
+                            List<string> emails = new List<string>();
+
                             foreach (var users in userId)
                             {
-                                var user = dbContext.Users.FirstOrDefault(u => u.Id == users && u.Role==Enums.Role.User);
+                                var user = dbContext.Users.FirstOrDefault(u => u.Id == users && u.Role == Enums.Role.User);
 
-                                if(user!=null)
+                                if (user != null)
                                 {
-                                    var groupLink = dbContext.GroupsLink.Where(x => x.User.Id == user.Id && x.Group.Id == group.Id);
+                                    var groupLink = dbContext.GroupsLink.Where(x => x.User.Id == user.Id && x.Group.Id == group.Id).ToList();
+                                    emails.Add(user.Email);
 
-                                    if (groupLink == null)
+                                    if (groupLink.Count == 0)
                                     {
                                         dbContext.GroupsLink.Add(new Models.DBModels.GroupsLink { User = user, Group = group });
                                     }
+                                    //else
+                                    //    return new CommonResult(Enums.CommonResultState.Warning, "Takie przypisanie juz istnieje");
                                 }
                                 else
                                 {
-                                    return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie obiekty istnieja");
+                                    return new CommonResult(Enums.CommonResultState.Warning, Properties.Resources.NoDataToAssign);
                                 }
                             }
-                            await dbContext.SaveChangesAsync();
-                            return new CommonResult(Enums.CommonResultState.OK, "Przypisanie przebieglo pomyslnie");
+
+                            
                         }
                         else
                         {
-                            return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie obiekty istnieja");
+                            return new CommonResult(Enums.CommonResultState.Warning, Properties.Resources.NoDataToAssign);
                         }
-                    }                 
+                    }
+
+                    emailService.SendEmailsGroups(userId, groupId);
+                    await dbContext.SaveChangesAsync();
+                    return new CommonResult(Enums.CommonResultState.OK, Properties.Resources.AssignCorrect);
                 }
 
-                return new CommonResult(Enums.CommonResultState.Warning, "Podane obiekty nie istnieja");
+                return new CommonResult(Enums.CommonResultState.Warning, Properties.Resources.NoDataToAssign);
             }
             catch (Exception ex)
             {
-                return new CommonResult(Enums.CommonResultState.Error, "Blad podczas przypisywania");
+                return new CommonResult(Enums.CommonResultState.Error, Properties.Resources.Error);
             }
         }
 
-        public List<HelperIdModel> DisplayAllGroup()
+        public List<HelperIdGroupModel> DisplayAllGroup()
         {
             try
             {
-                List<HelperIdModel> groupList = new List<HelperIdModel>();
+                List<HelperIdGroupModel> groupList = new List<HelperIdGroupModel>();
                 var groups = dbContext.Groups.ToList();
 
                 if (groups != null)
                 {
                     foreach (var group in groups)
                     {
-                        groupList.Add(new HelperIdModel { FirstId=group.Id.ToString(), SecondId = group.Name });
+                        groupList.Add(new HelperIdGroupModel { Id = group.Id.ToString(), Name = group.Name });
                     }
 
                     return groupList;
@@ -87,22 +99,22 @@ namespace SurveyIT.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Błąd wyswietlania");
+                throw new Exception(Properties.Resources.ErrorDisplay);
             }
         }
 
-        public List<HelperIdModel> DisplayAllUser()
+        public List<HelperIdUserModel> DisplayAllUser()
         {
             try
             {
-                List<HelperIdModel> userList = new List<HelperIdModel>();
-                var users = dbContext.Users.ToList().Where(x=>x.Role== Enums.Role.User);
+                List<HelperIdUserModel> userList = new List<HelperIdUserModel>();
+                var users = dbContext.Users.ToList().Where(x => x.Role == Enums.Role.User);
 
                 if (users != null)
                 {
                     foreach (var user in users)
                     {
-                        userList.Add(new HelperIdModel { FirstId = user.Id.ToString(), SecondId = user.UserName });
+                        userList.Add(new HelperIdUserModel { Id = user.Id.ToString(), Name = user.UserName });
                     }
 
                     return userList;
@@ -112,33 +124,46 @@ namespace SurveyIT.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Błąd wyswietlania");
+                throw new Exception(Properties.Resources.ErrorDisplay);
             }
         }
 
-        public List<HelperIdModel> DisplayAssignedUsers(string groupId)
+        public List<HelperIdGroupModel> DisplayAssignedUsers(string groupId)
         {
             try
             {
-                List<HelperIdModel> userList = new List<HelperIdModel>();
-                var groupLinks = dbContext.GroupsLink.Where(g => g.Group.Id.ToString() == groupId);
+                var newGroupId = int.Parse(groupId);
+                List<HelperIdGroupModel> userList = new List<HelperIdGroupModel>();
 
-                if (groupLinks != null)
+                var users = dbContext
+                    .GroupsLink
+                    .Where(gl => gl.Group.Id == newGroupId)
+                    .Select(gl => gl.User.Id).ToList();
+
+                if (users != null)
                 {
-                    foreach (var groupLink in groupLinks)
+                    foreach (var user in users)
                     {
-                        if(groupLink.User.Role == Enums.Role.User)
-                            userList.Add(new HelperIdModel { FirstId = groupLink.User.Id, SecondId = groupLink.User.UserName });
+                        var userDB = dbContext.Users.FirstOrDefault(u => u.Id == user);
+
+                        if (userDB != null)
+                        {
+                            if (userDB.Role == Enums.Role.User)
+                                userList.Add(new HelperIdGroupModel { Id = userDB.Id, Name = userDB.UserName });
+                        }
+
+
                     }
 
                     return userList;
                 }
 
+
                 return null;
             }
             catch (Exception ex)
             {
-                throw new Exception("Błąd wyswietlania");
+                throw new Exception(Properties.Resources.ErrorDisplay);
             }
         }
 
@@ -156,38 +181,42 @@ namespace SurveyIT.Services
                         {
                             foreach (var users in userId)
                             {
-                                var user = dbContext.Users.FirstOrDefault(u => u.Id == users && u.Role==Enums.Role.User);
+                                var user = dbContext.Users.FirstOrDefault(u => u.Id == users && u.Role == Enums.Role.User);
 
                                 if (user != null)
                                 {
-                                    var groupLink = dbContext.GroupsLink.Where(x => x.User.Id == user.Id && x.Group.Id == group.Id);
+                                    var groupLink = dbContext.GroupsLink.FirstOrDefault(x => x.User.Id == user.Id && x.Group.Id == group.Id);
 
                                     if (groupLink != null)
                                     {
-                                        dbContext.GroupsLink.Remove(new Models.DBModels.GroupsLink { User = user, Group = group });
+                                        dbContext.Users.FirstOrDefault(u => u.Id == users).GroupsLink.Remove(groupLink);
+                                        dbContext.Groups.FirstOrDefault(g=>g.Id == int.Parse(groups)).GroupsLink.Remove(groupLink);
+                                        dbContext.GroupsLink.Remove(groupLink);
                                     }
                                 }
                                 else
                                 {
-                                    return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie obiekty istnieja");
+                                    return new CommonResult(Enums.CommonResultState.Warning, Properties.Resources.NoDataExist);
                                 }
                             }
 
-                            await dbContext.SaveChangesAsync();
-                            return new CommonResult(Enums.CommonResultState.OK, "Odprzypisanie przebieglo pomyslnie");
+                            
                         }
                         else
                         {
-                            return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie obiekty istnieja");
+                            return new CommonResult(Enums.CommonResultState.Warning, Properties.Resources.NoDataExist);
                         }
                     }
+
+                    await dbContext.SaveChangesAsync();
+                    return new CommonResult(Enums.CommonResultState.OK, Properties.Resources.UnAssignCorrect);
                 }
 
-                return new CommonResult(Enums.CommonResultState.Warning, "Podane obiekty nie istnieja");
+                return new CommonResult(Enums.CommonResultState.Warning, Properties.Resources.NoDataExist);
             }
             catch (Exception ex)
             {
-                return new CommonResult(Enums.CommonResultState.Error, "Blad podczas odprzypisywania");
+                return new CommonResult(Enums.CommonResultState.Error, Properties.Resources.Error);
             }
         }
     }
