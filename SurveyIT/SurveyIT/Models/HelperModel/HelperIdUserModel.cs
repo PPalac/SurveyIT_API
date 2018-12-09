@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace SurveyIT.Models.HelperModel
 {
-    public class HelperIdModel
+    public class HelperIdUserModel
     {
-        public string FirstId { get; set; }
+        public string Id { get; set; }
 
-        public string SecondId { get; set; }
+        public string Name { get; set; }
     }
 }
