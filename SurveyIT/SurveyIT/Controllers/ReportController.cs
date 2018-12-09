@@ -20,7 +20,7 @@ namespace SurveyIT.Controllers
 
         //[Auth(Role.Admin)]
         [HttpGet("GetReportXlsx")]
-        public async Task<IActionResult> CreateSurvey([FromBody]int surveyId)
+        public async Task<IActionResult> GetReportXlsx([FromBody]int surveyId)
         {
             string filename = "export.xlsx";
             if (!ModelState.IsValid)
@@ -33,6 +33,25 @@ namespace SurveyIT.Controllers
                 return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
             }
                 
+
+            return BadRequest();
+        }
+
+        //[Auth(Role.Admin)]
+        [HttpGet("GetReportDocx")]
+        public async Task<IActionResult> GetReportDocx([FromBody]int surveyId)
+        {
+            string filename = "export.docx";
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var memory = reportService.GetReportDocx(surveyId, filename);
+
+            if (memory != null)
+            {
+                return File(memory, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", filename);
+            }
+
 
             return BadRequest();
         }

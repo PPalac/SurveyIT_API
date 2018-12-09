@@ -11,5 +11,6 @@ namespace SurveyIT.Interfaces.Services
     public interface IReportService
     {
         MemoryStream GetReportXlsx(int id, string fileName);
+        MemoryStream GetReportDocx(int id, string fileName);
     }
 }
