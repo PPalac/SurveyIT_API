@@ -18,5 +18,16 @@ namespace SurveyIT.Interfaces.Services
         UserModel GetOneUserById(string userId);
 
         Task<UserModel> GetUserByUsername(string username);
+
+        List<SurveyModel> GetAllNotFillSurvey(string userId);
+
+        List<SurveyModel> GetAllFillSurvey(string userId);
+
+        List<SurveyModel> GetAllNotFillSurveyAfterDate(string userId);
+
+        SurveyModel GetOneNotFillSurvey(string surveyId);
+
+        SurveyModel GetOneFillSurvey(string userId, string surveyId);
+
     }
 }

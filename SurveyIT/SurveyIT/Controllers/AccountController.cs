@@ -9,6 +9,7 @@ using SurveyIT.Attributes;
 using SurveyIT.Enums;
 using SurveyIT.Interfaces.Services;
 using SurveyIT.Models;
+using SurveyIT.Models.HelperModel;
 
 namespace SurveyIT.Controllers
 {
@@ -108,7 +109,101 @@ namespace SurveyIT.Controllers
         [HttpPost("DisplayUsers/User")]
         public JsonResult DisplayOneUser([FromBody]string userId)
         {
+            if (!ModelState.IsValid)
+            {
+                return Json("Błąd wyświetlania");
+            }
+
             var result = accountService.GetOneUserById(userId);
+
+            if (result != null)
+                return Json(result);
+
+            return Json("Błąd wyświetlania");
+
+        }
+
+
+        //Te metody do zmiany, bo mi logowanie nie dziala idk czemu, to musisz zamienic post na get i dac ta metode co wyciaga Ci usera (da sie zeby wyciagnelo id?)
+        //Bo wtedy nie musialbym zmieniac reszty metod gdzie przekazuje id a nie username
+        //[Auth(Roles = "Admin")]
+        [HttpPost("DisplayUsers/User/AllSurveys/NotFillSurvey")]
+        public JsonResult DisplayNotFillSurveys([FromBody]string userId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json("Błąd wyświetlania");
+            }
+
+            var result = accountService.GetAllNotFillSurvey(userId);
+
+            if (result != null)
+                return Json(result);
+
+            return Json("Błąd wyświetlania");
+
+        }
+
+        [HttpPost("DisplayUsers/User/AllSurveys/NotFillSurvey/GetOne")]
+        public JsonResult DisplayOneNotFillSurveys([FromBody]string surveyId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json("Błąd wyświetlania");
+            }
+
+            var result = accountService.GetOneNotFillSurvey(surveyId);
+
+            if (result != null)
+                return Json(result);
+
+            return Json("Błąd wyświetlania");
+
+        }
+
+        [HttpPost("DisplayUsers/User/AllSurveys/FillSurvey")]
+        public JsonResult DisplayFillSurveys([FromBody]string userId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json("Błąd wyświetlania");
+            }
+
+            var result = accountService.GetAllFillSurvey(userId);
+
+            if (result != null)
+                return Json(result);
+
+            return Json("Błąd wyświetlania");
+
+        }
+
+        [HttpPost("DisplayUsers/User/AllSurveys/FillSurvey/GetOne")]
+        public JsonResult DisplayOneFillSurveys([FromBody]HelperGetOneFillSurveyModel dataForDisplay)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json("Błąd wyświetlania");
+            }
+
+            var result = accountService.GetOneFillSurvey(dataForDisplay.userId, dataForDisplay.surveyId);
+
+            if (result != null)
+                return Json(result);
+
+            return Json("Błąd wyświetlania");
+
+        }
+
+        [HttpPost("DisplayUsers/User/AllSurveys/NotFillSurveyAfterDate")]
+        public JsonResult DisplayNotFillSurveysAfterDate([FromBody]string userId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json("Błąd wyświetlania");
+            }
+
+            var result = accountService.GetAllNotFillSurveyAfterDate(userId);
 
             if (result != null)
                 return Json(result);

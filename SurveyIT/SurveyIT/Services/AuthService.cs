@@ -28,21 +28,32 @@ namespace SurveyIT.Services
 
         public async Task<bool> RegisterUser(RegistrationModel userData)
         {
-            await CreateRoles();
+            try
+            {
+                await CreateRoles();
 
-            var user = new Users { FirstName = userData.FirstName, LastName = userData.LastName, Email = userData.Email, UserName = userData.Username };
+                var user = new Users { FirstName = userData.FirstName, LastName = userData.LastName, Email = userData.Email, UserName = userData.Username , Role=Role.User};
 
-            var result = await userManager.CreateAsync(user, userData.Password);
+                if (user == null || string.IsNullOrEmpty(userData.Password))
+                    return false;
 
-            if (!result.Succeeded)
-                return false;
+                var result = await userManager.CreateAsync(user, userData.Password);
 
-            var addToRoleResult = await userManager.AddToRoleAsync(user, Role.User.ToString());
+                if (!result.Succeeded)
+                    return false;
 
-            if (!addToRoleResult.Succeeded)
-                return false;
+                var addToRoleResult = await userManager.AddToRoleAsync(user, Role.User.ToString());
 
-            return true;
+                if (!addToRoleResult.Succeeded)
+                    return false;
+
+                return true;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+            
         }
 
         public async Task<Users> Authenticate(LoginModel login)
