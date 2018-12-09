@@ -15,10 +15,12 @@ namespace SurveyIT.Services
     public class SurveyService : ISurveyService
     {
         private MyDbContext dbContext;
+        private EmailService emailService;
 
         public SurveyService(MyDbContext dbContext)
         {
             this.dbContext = dbContext;
+            emailService = new EmailService(dbContext);
         }
 
         #region ValidationRegion
@@ -35,7 +37,7 @@ namespace SurveyIT.Services
                         var resultValidationQuestion = ValidationQuestion(surveyModel);
                         if (resultValidationQuestion.StateMessage == CommonResultState.OK)
                         {
-                            resultValidationQuestion.Message = "Walidacja poprawna";
+                            resultValidationQuestion.Message = Properties.Resources.CorrectValidation;
                             return resultValidationQuestion;
                         }
 
@@ -49,7 +51,7 @@ namespace SurveyIT.Services
             }
             catch (Exception ex)
             {
-                return new CommonResult(CommonResultState.Error, "Błąd podczas walidacji");
+                return new CommonResult(CommonResultState.Error, Properties.Resources.ErrorValidation);
             }
 
 
@@ -59,11 +61,11 @@ namespace SurveyIT.Services
         public CommonResult ValidationSurveyDate(SurveyModel surveyModel)
         {
             if (surveyModel.Start_date > surveyModel.End_date)
-                return new CommonResult(CommonResultState.Warning, "Data rozpoczecia jest wieksza niz data zakonczenia");
+                return new CommonResult(CommonResultState.Warning, Properties.Resources.NotValidData1);
             else if (surveyModel.Start_date < DateTime.Now.Date)
-                return new CommonResult(CommonResultState.Warning, "Data rozpoczecia musi byc wieksza badz od aktualnej");
+                return new CommonResult(CommonResultState.Warning, Properties.Resources.NotValidData2);
             else
-                return new CommonResult(CommonResultState.OK, "Poprawna walidacja daty");
+                return new CommonResult(CommonResultState.OK, Properties.Resources.CorrectDataValidation);
 
         }
 
@@ -76,18 +78,18 @@ namespace SurveyIT.Services
                     if (surveyModel.Name.Length > 3)
                     {
                         if (dbContext.Surveys.Any(g => g.Name == surveyModel.Name))
-                            return new CommonResult(CommonResultState.Warning, "Ankieta o takiej nazwie juz istnieje");
+                            return new CommonResult(CommonResultState.Warning, Properties.Resources.SurveyNameUsed);
                         else
-                            return new CommonResult(CommonResultState.OK, "Walidacja nazwy poprawna");
+                            return new CommonResult(CommonResultState.OK, Properties.Resources.CorrectValidation);
                     }
 
-                    return new CommonResult(CommonResultState.Warning, "Za krotka nazwa");
+                    return new CommonResult(CommonResultState.Warning, Properties.Resources.ShortGroupName);
                 }
 
-                return new CommonResult(CommonResultState.Warning, "Nazwa powinna zaczynać się od wielkiej litery");
+                return new CommonResult(CommonResultState.Warning, Properties.Resources.NotValidName);
             }
 
-            return new CommonResult(CommonResultState.Error, "Walidacja nazwy niepoprawna");
+            return new CommonResult(CommonResultState.Error, Properties.Resources.ErrorValidation);
         }
 
         public CommonResult ValidationQuestion(SurveyModel surveyModel)
@@ -106,28 +108,28 @@ namespace SurveyIT.Services
                                 {
                                     if (string.IsNullOrEmpty(answer.Content))
                                     {
-                                        return new CommonResult(CommonResultState.Warning, "Odpowiedz nie zawiera tekstu");
+                                        return new CommonResult(CommonResultState.Warning, Properties.Resources.AnswerWithoutContent);
                                     }
                                 }
                             }
 
-                            if (question.QuestionType == QuestionType.Open && !string.IsNullOrEmpty(question.Answers.FirstOrDefault().Content))
+                            if (question.QuestionType == QuestionType.Open && question.Answers.Count!=0)
                             {
-                                return new CommonResult(CommonResultState.Warning, "Odpowiedz powinna byc pusta");
+                                return new CommonResult(CommonResultState.Warning, Properties.Resources.Answer1);
                             }
                         }
                         else
-                            return new CommonResult(CommonResultState.Warning, "Pytanie nie zawiera odpowiedzi");
+                            return new CommonResult(CommonResultState.Warning, Properties.Resources.Question1);
                     }
                     else
-                        return new CommonResult(CommonResultState.Warning, "Pytanie nie ma tresci");
+                        return new CommonResult(CommonResultState.Warning, Properties.Resources.Question2);
 
                 }
 
-                return new CommonResult(CommonResultState.OK, "Walidacja pytan poprawna");
+                return new CommonResult(CommonResultState.OK, Properties.Resources.CorrectValidation);
             }
             else
-                return new CommonResult(CommonResultState.Warning, "Ankieta nie zawiera pytan");
+                return new CommonResult(CommonResultState.Warning, Properties.Resources.SurveyWithoutQuestions);
         }
 
         public CommonResult ValidationFillQuestion(SurveyModel surveyModel)
@@ -143,13 +145,13 @@ namespace SurveyIT.Services
                             if (question.QuestionType == QuestionType.Single)
                             {
                                 if (!(question.Answers.Count == 1 && !string.IsNullOrEmpty(question.Answers[0].Content)))
-                                    return new CommonResult(CommonResultState.Warning, "Bledna walidacja odpowiedzi");
+                                    return new CommonResult(CommonResultState.Warning, Properties.Resources.ErrorValidationAnswers);
                             }
                             else if (question.QuestionType == QuestionType.Open)
                             {
                                 if (!(question.Answers.Count == 1 && !string.IsNullOrEmpty(question.Answers[0].Content)))
                                 {
-                                    return new CommonResult(CommonResultState.Warning, "Bledna walidacja odpowiedzi");
+                                    return new CommonResult(CommonResultState.Warning, Properties.Resources.ErrorValidationAnswers);
                                 }
                             }
                             else
@@ -160,7 +162,7 @@ namespace SurveyIT.Services
                                     {
                                         if (!string.IsNullOrEmpty(answer.Content))
                                         {
-                                            return new CommonResult(CommonResultState.Warning, "Bledna walidacja odpowiedzi");
+                                            return new CommonResult(CommonResultState.Warning, Properties.Resources.ErrorValidationAnswers);
                                         }
                                     }
 
@@ -168,18 +170,59 @@ namespace SurveyIT.Services
                             }
                         }
                         else
-                            return new CommonResult(CommonResultState.Warning, "Pytanie nie zawiera odpowiedzi");
+                            return new CommonResult(CommonResultState.Warning, Properties.Resources.Question1);
                     }
                     else
-                        return new CommonResult(CommonResultState.Warning, "Pytanie nie ma tresci");
+                        return new CommonResult(CommonResultState.Warning, Properties.Resources.Question2);
 
                 }
 
-                return new CommonResult(CommonResultState.OK, "Walidacja pytan poprawna");
+                return new CommonResult(CommonResultState.OK, Properties.Resources.CorrectValidation);
 
             }
             else
-                return new CommonResult(CommonResultState.Warning, "Ankieta nie zawiera pytan");
+                return new CommonResult(CommonResultState.Warning, Properties.Resources.SurveyWithoutQuestions);
+        }
+
+        public CommonResult ValidationFillSurvey(List<UserAnswerModel> UserAnswerModelsList, string surveyId)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(surveyId))
+                {
+                    var survey = dbContext.Surveys.FirstOrDefault(x => x.Id.ToString() == surveyId);
+                    if (survey != null)
+                    {
+                        if (UserAnswerModelsList != null)
+                        {
+                            foreach (var answerModel in UserAnswerModelsList)
+                            {
+                                if (!string.IsNullOrEmpty(answerModel.questionId))
+                                {
+                                    if (string.IsNullOrEmpty(answerModel.Content))
+                                    {
+                                        return new CommonResult(CommonResultState.Warning, Properties.Resources.AnswerIsEmpty);
+                                    }
+                                }
+                                else
+                                {
+                                    return new CommonResult(CommonResultState.Warning, Properties.Resources.AnswerWithoutQuestio);
+                                }
+                            }
+
+                            return new CommonResult(CommonResultState.OK, Properties.Resources.CorrectValidation);
+                        }
+
+                        return new CommonResult(CommonResultState.Warning, Properties.Resources.AnswerIsEmpty);
+                    }
+                }
+
+                return new CommonResult(CommonResultState.Warning, Properties.Resources.SurveyNotExist);
+            }
+            catch (Exception)
+            {
+                return new CommonResult(CommonResultState.Error, Properties.Resources.ErrorValidation);
+            }
         }
         #endregion
 
@@ -218,12 +261,7 @@ namespace SurveyIT.Services
                             newQuesion.Content = question.Content;
                             newQuesion.QuestionType = question.QuestionType;
                             newQuesion.QuestionsList = new List<Questions_List>();
-
-                            var questionExist = dbContext.Questions.FirstOrDefault(x => x.Content == newQuesion.Content);
-                            if (questionExist == null)
-                                dbContext.Questions.Add(newQuesion);
-                            else
-                                newQuesion.Id = questionExist.Id;
+                            dbContext.Questions.Add(newQuesion);
 
                             newQuesion.QuestionsList.Add(new Questions_List { SurveyId = newSurvey.Id });
 
@@ -234,12 +272,7 @@ namespace SurveyIT.Services
                                     var newAnswer = new Answers();
                                     newAnswer.Content = answer.Content;
                                     newAnswer.AnswerList = new List<Answers_List>();
-
-                                    var answersExist = dbContext.Answers.FirstOrDefault(x => x.Content == newAnswer.Content);
-                                    if (answersExist == null)
-                                        dbContext.Answers.Add(newAnswer);
-                                    else
-                                        newAnswer.Id = answersExist.Id;
+                                    dbContext.Answers.Add(newAnswer);
 
                                     newAnswer.AnswerList.Add(new Answers_List { QuestionId = newQuesion.Id });
                                     dbContext.Answers.Add(newAnswer);
@@ -249,7 +282,7 @@ namespace SurveyIT.Services
                     }
 
                     await dbContext.SaveChangesAsync();
-                    resultValidation.Message = "Pomyslnie stworzono ankiete";
+                    resultValidation.Message = Properties.Resources.CreateSurvey;
                     return resultValidation;
                 }
 
@@ -257,7 +290,7 @@ namespace SurveyIT.Services
             }
             catch (Exception ex)
             {
-                return new CommonResult(CommonResultState.Error, "Blad podczas tworzenia ankiety");
+                return new CommonResult(CommonResultState.Error, Properties.Resources.Error);
             }
         }
 
@@ -280,33 +313,33 @@ namespace SurveyIT.Services
 
                                 if (groupDB != null)
                                 {
-                                    var surveyList = dbContext.Surveys_List.Where(x => x.Group.Id == groupDB.Id && x.Survey.Id == surveyDB.Id);
+                                    var surveyList = dbContext.Surveys_List.Where(x => x.Group.Id == groupDB.Id && x.Survey.Id == surveyDB.Id).ToList();
 
-                                    if (surveyList == null)
+                                    if (surveyList.Count == 0)
                                         dbContext.Surveys_List.Add(new Surveys_List { Group = groupDB, Survey = surveyDB });
                                 }
                                 else
                                 {
-                                    return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie grupy istnieja");
+                                    return new CommonResult(Enums.CommonResultState.Warning, Properties.Resources.GroupNotExist);
                                 }
                             }
                         }
                         else
                         {
-                            return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie ankiety istnieja");
+                            return new CommonResult(Enums.CommonResultState.Warning, Properties.Resources.SurveyNotExist);
                         }
                     }
 
-
+                    emailService.SendEmailsSurveys(groupId, surveyId);
                     await dbContext.SaveChangesAsync();
-                    return new CommonResult(Enums.CommonResultState.OK, "Przypisanie poprawne");
+                    return new CommonResult(Enums.CommonResultState.OK, Properties.Resources.AssignCorrect);
                 }
 
-                return new CommonResult(Enums.CommonResultState.Warning, "Brak obiektow do przypisania");
+                return new CommonResult(Enums.CommonResultState.Warning, Properties.Resources.NoDataToAssign);
             }
             catch (Exception ex)
             {
-                return new CommonResult(Enums.CommonResultState.Error, "Blad podczas przypisywania");
+                return new CommonResult(Enums.CommonResultState.Error, Properties.Resources.Error);
             }
         }
 
@@ -327,33 +360,38 @@ namespace SurveyIT.Services
 
                                 if (groupDB != null)
                                 {
-                                    var surveyList = dbContext.Surveys_List.Where(x => x.Group.Id == groupDB.Id && x.Survey.Id == surveyDB.Id);
+                                    var surveyList = dbContext.Surveys_List.FirstOrDefault(x => x.Group.Id == groupDB.Id && x.Survey.Id == surveyDB.Id);
 
                                     if (surveyList != null)
-                                        dbContext.Surveys_List.Remove(new Surveys_List { Group = groupDB, Survey = surveyDB });
+                                    {
+                                        dbContext.Surveys.FirstOrDefault(s => s.Id == int.Parse(survey)).SurveysList.Remove(surveyList);
+                                        dbContext.Groups.FirstOrDefault(g => g.Id == int.Parse(group)).SurveysList.Remove(surveyList);
+                                        dbContext.Surveys_List.Remove(surveyList);
+                                    }
+
                                 }
                                 else
                                 {
-                                    return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie grupy istnieja");
+                                    return new CommonResult(Enums.CommonResultState.Warning, Properties.Resources.GroupNotExist);
                                 }
                             }
                         }
                         else
                         {
-                            return new CommonResult(Enums.CommonResultState.Warning, "Nie wszystkie ankiety istnieja");
+                            return new CommonResult(Enums.CommonResultState.Warning, Properties.Resources.SurveyNotExist);
                         }
                     }
 
 
                     await dbContext.SaveChangesAsync();
-                    return new CommonResult(Enums.CommonResultState.OK, "Przypisanie poprawne");
+                    return new CommonResult(Enums.CommonResultState.OK, Properties.Resources.AssignCorrect);
                 }
 
-                return new CommonResult(Enums.CommonResultState.Warning, "Brak obiektow do przypisania");
+                return new CommonResult(Enums.CommonResultState.Warning, Properties.Resources.NoDataToAssign);
             }
             catch (Exception ex)
             {
-                return new CommonResult(Enums.CommonResultState.Error, "Blad podczas przypisywania");
+                return new CommonResult(Enums.CommonResultState.Error, Properties.Resources.Error);
             }
         }
         #endregion
@@ -429,7 +467,7 @@ namespace SurveyIT.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Błąd wyswietlania");
+                throw new Exception(Properties.Resources.ErrorDisplay);
             }
         }
 
@@ -455,19 +493,43 @@ namespace SurveyIT.Services
             }
             catch (Exception)
             {
-                throw new Exception("Błąd wyswietlania");
+                throw new Exception(Properties.Resources.ErrorDisplay);
             }
         }
 
         #region FillSurvey
-        public async Task<CommonResult> FillSurvey(string surveyId, List<string> questionsID, List<AnswerModel> answerModelsList)
+        public async Task<CommonResult> FillSurvey(string surveyId, List<UserAnswerModel> UserAnswerModelsList, string user)
         {
             try
             {
-                var validationFillSurvey = ValidationFillSurvey(answerModelsList);
+                var validationFillSurvey = ValidationFillSurvey(UserAnswerModelsList, surveyId);
 
-                if(validationFillSurvey.StateMessage == CommonResultState.OK)
+                if (validationFillSurvey.StateMessage == CommonResultState.OK)
                 {
+                    foreach (var userAnswer in UserAnswerModelsList)
+                    {
+                        UserAnswers usAnswer = new UserAnswers();
+                        usAnswer.Content = userAnswer.Content;
+                        usAnswer.UserAnswerList = new List<UserAnswers_List>();
+                        usAnswer.UserLinkL = new List<UsersLink>();
+
+                        usAnswer.UserAnswerList.Add(new UserAnswers_List { QuestionId = int.Parse(userAnswer.questionId) });
+
+                        var userId = dbContext.Users.FirstOrDefault(x => x.Id == user);
+
+                        if (userId != null)
+                            usAnswer.UserLinkL.Add(new UsersLink { UserId = userId.Id });
+                        else
+                            return new CommonResult(CommonResultState.Error, Properties.Resources.UserNotExist);
+
+                        dbContext.UserAnswers.Add(usAnswer);
+
+                    }
+
+
+                    await dbContext.SaveChangesAsync();
+                    validationFillSurvey.Message = Properties.Resources.FillSurvey;
+                    return validationFillSurvey;
 
                 }
 
@@ -475,17 +537,9 @@ namespace SurveyIT.Services
             }
             catch (Exception)
             {
-
-                throw;
+                return new CommonResult(CommonResultState.Error, Properties.Resources.Error);
             }
         }
-
-        public CommonResult ValidationFillSurvey(List<AnswerModel> answerModelsList)
-        {
-            throw new NotImplementedException();
-        }
-
-
         #endregion
     }
 }

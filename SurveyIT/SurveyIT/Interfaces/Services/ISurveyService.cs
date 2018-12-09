@@ -21,8 +21,8 @@ namespace SurveyIT.Interfaces.Services
 
         SurveyModel GetOneSurvey(string surveyId);
 
-        Task<CommonResult> FillSurvey(string surveyId, List<string> questionsID, List<AnswerModel> answerModelsList);
+        Task<CommonResult> FillSurvey(string surveyId, List<UserAnswerModel> UserAnswerModelsList, string user);
 
-        CommonResult ValidationFillSurvey(List<AnswerModel> answerModelsList);
+        CommonResult ValidationFillSurvey(List<UserAnswerModel> UserAnswerModelsList, string surveyId);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SurveyIT.Enums;
@@ -92,6 +93,25 @@ namespace SurveyIT.Controllers
 
             return BadRequest(result.Message);
         }
+
+        //[Auth(Role.Admin)]
+        [HttpPost("FillSurvey")]
+        public async Task<IActionResult> fillSurvey([FromBody]HelperFillSurveyModel fillSurveyModel)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+            
+            var user = HttpContext.User.Identities.First().Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+
+            var result = await surveyService.FillSurvey(fillSurveyModel.surveyId, fillSurveyModel.UserAnswerModel, fillSurveyModel.userId);
+
+            if (result.StateMessage == CommonResultState.OK)
+                return Ok(result.Message);
+
+            return BadRequest(result.Message);
+        }
+
+
 
 
 
