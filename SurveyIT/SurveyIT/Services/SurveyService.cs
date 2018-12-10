@@ -62,7 +62,7 @@ namespace SurveyIT.Services
         {
             if (surveyModel.Start_date > surveyModel.End_date)
                 return new CommonResult(CommonResultState.Warning, Properties.Resources.NotValidData1);
-            else if (surveyModel.Start_date < DateTime.Now.Date)
+            else if (surveyModel.Start_date.Date < DateTime.Now.Date)
                 return new CommonResult(CommonResultState.Warning, Properties.Resources.NotValidData2);
             else
                 return new CommonResult(CommonResultState.OK, Properties.Resources.CorrectDataValidation);
@@ -472,18 +472,18 @@ namespace SurveyIT.Services
         }
 
 
-        public List<Tuple<string, string>> GetAllSurveys()
+        public List<SurveyModel> GetAllSurveys()
         {
             try
             {
-                List<Tuple<string, string>> surveyList = new List<Tuple<string, string>>();
+                List<SurveyModel> surveyList = new List<SurveyModel>();
                 var surveys = dbContext.Surveys.ToList();
 
                 if (surveys != null)
                 {
                     foreach (var survey in surveys)
                     {
-                        surveyList.Add(new Tuple<string, string>(survey.Id.ToString(), survey.Name));
+                        surveyList.Add(new SurveyModel { Id = survey.Id, Name = survey.Name});
                     }
 
                     return surveyList;

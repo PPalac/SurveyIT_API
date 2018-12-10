@@ -80,6 +80,7 @@ namespace SurveyIT
                 .AddJsonOptions(options =>
                 {
                     options.SerializerSettings.DateFormatString = "dd-MM-yyyy";
+                    options.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.RoundtripKind;
                 });
 
             services.AddScoped<IAuthService, AuthService>();
@@ -121,7 +122,6 @@ namespace SurveyIT
             app.UseAuthentication();
             
             app.UseMvc();
-
         }
     }
 }

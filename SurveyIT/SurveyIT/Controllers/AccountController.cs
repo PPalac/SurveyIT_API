@@ -125,7 +125,7 @@ namespace SurveyIT.Controllers
         //Te metody do zmiany, bo mi logowanie nie dziala idk czemu, to musisz zamienic post na get i dac ta metode co wyciaga Ci usera (da sie zeby wyciagnelo id?)
         //Bo wtedy nie musialbym zmieniac reszty metod gdzie przekazuje id a nie username
         [Authorize]
-        [HttpPost("DisplayUsers/User/AllSurveys/NotFillSurvey")]
+        [HttpGet("DisplayUsers/User/AllSurveys/NotFillSurvey")]
         public JsonResult DisplayNotFillSurveys()
         {
             var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);

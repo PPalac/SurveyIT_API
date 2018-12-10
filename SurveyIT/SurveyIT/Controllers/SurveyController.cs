@@ -39,13 +39,13 @@ namespace SurveyIT.Controllers
             return BadRequest(result.Message);
         }
 
-        [Auth(Role.Admin)]
+        [Authorize]
         [HttpGet("DisplayAll")]
         public IActionResult DisplayAll()
         {
 
             if (HttpContext.User.FindFirstValue(ClaimTypes.Role) == Role.User.ToString())
-                return RedirectToAction("DisplayNotFillSurveysAfterDate", "Account");
+                return RedirectToAction("DisplayNotFillSurveys", "Account");
 
             var result = surveyService.GetAllSurveys();
 
@@ -56,7 +56,7 @@ namespace SurveyIT.Controllers
         }
 
         [Authorize]
-        [HttpPost("DisplayAll/DisplayOne")]
+        [HttpGet("DisplayAll/DisplayOne")]
         public JsonResult DisplayOneSurvey([FromQuery] string surveyId)
         {
             if (!ModelState.IsValid)
