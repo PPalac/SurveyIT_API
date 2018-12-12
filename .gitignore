@@ -332,3 +332,4 @@ ASALocalRun/
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
 SurveyIT/SurveyIT/Migrations/DbContextModelSnapshot.cs
+/SurveyIT/SurveyIT/wwwroot

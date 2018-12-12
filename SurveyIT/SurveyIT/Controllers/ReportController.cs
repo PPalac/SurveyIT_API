@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SurveyIT.Attributes;
+using SurveyIT.Enums;
 using SurveyIT.Interfaces.Services;
 using System;
 using System.Collections.Generic;
@@ -18,9 +20,9 @@ namespace SurveyIT.Controllers
             this.reportService = reportService;
         }
 
-        //[Auth(Role.Admin)]
+        [Auth(Role.Admin)]
         [HttpGet("GetReportXlsx")]
-        public async Task<IActionResult> GetReportXlsx([FromBody]int surveyId)
+        public async Task<IActionResult> GetReportXlsx([FromQuery]int surveyId)
         {
             string filename = "export.xlsx";
             if (!ModelState.IsValid)
@@ -37,9 +39,9 @@ namespace SurveyIT.Controllers
             return BadRequest();
         }
 
-        //[Auth(Role.Admin)]
+        [Auth(Role.Admin)]
         [HttpGet("GetReportDocx")]
-        public async Task<IActionResult> GetReportDocx([FromBody]int surveyId)
+        public async Task<IActionResult> GetReportDocx([FromQuery]int surveyId)
         {
             string filename = "export.docx";
             if (!ModelState.IsValid)
@@ -51,7 +53,6 @@ namespace SurveyIT.Controllers
             {
                 return File(memory, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", filename);
             }
-
 
             return BadRequest();
         }

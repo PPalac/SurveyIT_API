@@ -100,7 +100,7 @@ namespace SurveyIT.Controllers
             return BadRequest(result.Message);
         }
 
-        [Auth(Role.Admin)]
+        [Auth(Role.User)]
         [HttpPost("FillSurvey")]
         public async Task<IActionResult> FillSurvey([FromBody]HelperFillSurveyModel fillSurveyModel)
         {
@@ -116,10 +116,5 @@ namespace SurveyIT.Controllers
 
             return BadRequest(result.Message);
         }
-
-
-
-
-
     }
 }
