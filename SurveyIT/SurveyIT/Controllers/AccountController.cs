@@ -152,7 +152,8 @@ namespace SurveyIT.Controllers
 
         }
 
-        [HttpPost("DisplayUsers/User/AllSurveys/FillSurvey")]
+        [Authorize]
+        [HttpGet("DisplayUsers/User/AllSurveys/FillSurvey")]
         public JsonResult DisplayFillSurveys()
         {
             var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -196,7 +197,7 @@ namespace SurveyIT.Controllers
 
         }
 
-        [Auth(Role.Admin)]
+        [Authorize]
         [HttpGet("CurrentUser")]
         public async Task<IActionResult> GetCurrentUser()
         {
