@@ -77,6 +77,7 @@ namespace SurveyIT.Services
                                         row.CreateCell(1).SetCellValue(question.Content);
                                         row = excelSheet.CreateRow(line++);
                                         row.CreateCell(0).SetCellValue("Odpowiedzi");
+                                        row.CreateCell(1).SetCellValue("Ilość");
                                         // Get question answers
                                         List<Answers> answers = question.AnswerList.ToList().Select(p => p.Answer).ToList();
                                         // For every answer
@@ -100,6 +101,7 @@ namespace SurveyIT.Services
                                         row.CreateCell(1).SetCellValue(question.Content);
                                         row = excelSheet.CreateRow(line++);
                                         row.CreateCell(0).SetCellValue("Odpowiedzi");
+                                        row.CreateCell(1).SetCellValue("Ilość");
                                         // Get question answers
                                         List<Answers> answers = question.AnswerList.ToList().Select(p => p.Answer).ToList();
                                         // For every answer
@@ -183,7 +185,6 @@ namespace SurveyIT.Services
                 string sFileName = fileName;
                 FileInfo file = new FileInfo(Path.Combine(sWebRootFolder, sFileName));
                 var memory = new MemoryStream();
-                int line = 0;
                 using (var fs = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Create, FileAccess.Write))
                 {
                     XWPFDocument document;
@@ -192,8 +193,6 @@ namespace SurveyIT.Services
                     // Create header
                     XWPFParagraph p1 = document.CreateParagraph();
                     p1.Alignment = ParagraphAlignment.CENTER;
-                    p1.BorderBottom = Borders.Double;
-                    p1.BorderTop = Borders.Double;
                     XWPFRun r1 = p1.CreateRun();
                     r1.IsBold = true;
                     r1.SetText("Raport" + survey.Name);
@@ -209,7 +208,10 @@ namespace SurveyIT.Services
                                     p2.Alignment = ParagraphAlignment.LEFT;
                                     XWPFRun r2 = p2.CreateRun();
                                     r2.IsBold = true;
-                                    r1.SetText("Pytanie jednokrotnego wyboru" + question.Content + "\nOdpowiedzi");
+                                    r1.SetText("Pytanie jednokrotnego wyboru");
+                                    r1.AddCarriageReturn();
+                                    r1.SetText(question.Content);
+                                    r2.SetText("Odpowiedzi");
                                     // Get question answers
                                     List<Answers> answers = question.AnswerList.ToList().Select(p => p.Answer).ToList();
 
@@ -233,7 +235,10 @@ namespace SurveyIT.Services
                                     p2.Alignment = ParagraphAlignment.LEFT;
                                     XWPFRun r2 = p2.CreateRun();
                                     r2.IsBold = true;
-                                    r1.SetText("Pytanie wielokrotnego wyboru" + question.Content + "\nOdpowiedzi");
+                                    r1.SetText("Pytanie wielokrotnego wyboru");
+                                    r1.AddCarriageReturn();
+                                    r1.SetText(question.Content);
+                                    r2.SetText("Odpowiedzi");
                                     // Get question answers
                                     List<Answers> answers = question.AnswerList.ToList().Select(p => p.Answer).ToList();
 
@@ -253,12 +258,14 @@ namespace SurveyIT.Services
                             case Enums.QuestionType.Open:
                                 {
                                     // Print question
-                                    // Print question
                                     XWPFParagraph p2 = document.CreateParagraph();
                                     p2.Alignment = ParagraphAlignment.LEFT;
                                     XWPFRun r2 = p2.CreateRun();
                                     r2.IsBold = true;
-                                    r1.SetText("Pytanie otwarte" + question.Content + "\nOdpowiedzi");
+                                    r1.SetText("Pytanie otwarte");
+                                    r1.AddCarriageReturn();
+                                    r1.SetText(question.Content);
+                                    r2.SetText("Odpowiedzi");
                                     // Get user answers
                                     List<UserAnswers> userAnswers = question.UserAnswerList.ToList().Select(p => p.UserAnswer).ToList();
 
