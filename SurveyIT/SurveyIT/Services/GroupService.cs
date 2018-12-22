@@ -214,5 +214,12 @@ namespace SurveyIT.Services
                 throw new Exception(Properties.Resources.Error);
             }
         }
+
+        public List<GroupModel> GetGroupsForSurvey(int surveyId)
+        {
+            var result = dbContext.Groups.Where(g => g.SurveysList.Select(sl => sl.Survey.Id).Any(sl => sl == surveyId)).Select(g => new GroupModel { Id = g.Id, Name = g.Name }).ToList(); ;
+
+            return result;
+        }
     }
 }

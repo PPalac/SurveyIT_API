@@ -29,7 +29,7 @@ namespace SurveyIT.Controllers
         public async Task<IActionResult> CreateSurvey([FromBody]SurveyModel survey)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest("Niepoprawne dane");
 
             var result = await surveyService.AddSurvey(survey);
 

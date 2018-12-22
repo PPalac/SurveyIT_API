@@ -21,5 +21,7 @@ namespace SurveyIT.Interfaces.Services
         List<GroupModel> GetAllGroups();
 
         GroupModel GetOneGroup(string groupId);
+
+        List<GroupModel> GetGroupsForSurvey(int surveyId);
     }
 }
